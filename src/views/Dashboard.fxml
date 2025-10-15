@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.DashboardController"
+            prefWidth="1000" prefHeight="700"
+            style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: rgba(45, 52, 54, 0.95); -fx-padding: 20;">
+            <Label fx:id="welcomeLabel"
+                   style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="TeleHealth System v2.0"
+                   style="-fx-text-fill: #ddd; -fx-font-size: 14px;" />
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" 
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="30" alignment="CENTER" maxWidth="900"
+                  style="-fx-background-color: rgba(255, 255, 255, 0.98);
+                         -fx-background-radius: 25;
+                         -fx-padding: 40;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0.5, 0, 8);">
+                
+                <Label text="🏥 TeleHealth System Dashboard"
+                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2d3436;" />
+                
+                <Label text="Comprehensive Healthcare Management Platform"
+                       style="-fx-font-size: 16px; -fx-text-fill: #636e72; -fx-font-style: italic;" />
+
+                <!-- Patient Services Section -->
+                <VBox spacing="20" alignment="CENTER">
+                    <HBox spacing="10" alignment="CENTER">
+                        <Separator prefWidth="50"/>
+                        <Label text="👤 Patient Services"
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0984e3;"/>
+                        <Separator prefWidth="50"/>
+                    </HBox>
+                    
+                    <GridPane hgap="20" vgap="15" alignment="CENTER">
+                        <columnConstraints>
+                            <ColumnConstraints prefWidth="200"/>
+                            <ColumnConstraints prefWidth="200"/>
+                            <ColumnConstraints prefWidth="200"/>
+                            <ColumnConstraints prefWidth="200"/>
+                        </columnConstraints>
+
+                        <Button text="📅 Book Consultation" onAction="#goToBookConsultation"
+                                GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                prefWidth="190" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #74b9ff, #0984e3);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+
+                        <Button text="💊 Prescription Refill" onAction="#goToPrescriptionRefill"
+                                GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                prefWidth="190" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #00b894, #00a085);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+
+                        <Button text="💓 Monitor Vitals" onAction="#goToVitalsMonitoring"
+                                GridPane.rowIndex="0" GridPane.columnIndex="2"
+                                prefWidth="190" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #fd79a8, #e84393);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+
+                        <Button text="📄 Health Report" onAction="#goToHealthReport"
+                                GridPane.rowIndex="0" GridPane.columnIndex="3"
+                                prefWidth="190" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #a29bfe, #6c5ce7);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                    </GridPane>
+                </VBox>
+
+                <Separator style="-fx-background-color: #ddd;"/>
+
+                <!-- Healthcare Staff Section -->
+                <VBox spacing="20" alignment="CENTER">
+                    <HBox spacing="10" alignment="CENTER">
+                        <Separator prefWidth="50"/>
+                        <Label text="👩‍⚕️ Healthcare Staff"
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #00b894;"/>
+                        <Separator prefWidth="50"/>
+                    </HBox>
+                    
+                    <Button text="🗓️ Manage Patient Bookings" onAction="#goToStaffBooking"
+                            prefWidth="350" prefHeight="50"
+                            style="-fx-background-color: linear-gradient(to bottom, #00cec9, #00b894);
+                                   -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
+                                   -fx-background-radius: 15; -fx-padding: 10;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                </VBox>
+
+                <Separator style="-fx-background-color: #ddd;"/>
+
+                <!-- Doctor Services Section -->
+                <VBox spacing="20" alignment="CENTER">
+                    <HBox spacing="10" alignment="CENTER">
+                        <Separator prefWidth="50"/>
+                        <Label text="👨‍⚕️ Doctor Services"
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e17055;"/>
+                        <Separator prefWidth="50"/>
+                    </HBox>
+                    
+                    <HBox spacing="25" alignment="CENTER">
+                        <Button text="🩺 Record Diagnosis" onAction="#goToDoctorDiagnosis"
+                                prefWidth="240" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #e17055, #d63031);
+                                       -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+
+                        <Button text="🏥 Hospital Referrals" onAction="#goToHospitalBooking"
+                                prefWidth="240" prefHeight="50"
+                                style="-fx-background-color: linear-gradient(to bottom, #fd79a8, #e84393);
+                                       -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                       -fx-background-radius: 15; -fx-padding: 10;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                    </HBox>
+                </VBox>
+
+                <Separator style="-fx-background-color: #ddd;"/>
+
+                <!-- Quick Stats -->
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="📊 System Overview"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <HBox spacing="30" alignment="CENTER">
+                        <VBox spacing="5" alignment="CENTER" 
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
+                            <Label text="24/7" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0984e3;"/>
+                            <Label text="Available" style="-fx-font-size: 12px; -fx-text-fill: #636e72;"/>
+                        </VBox>
+                        
+                        <VBox spacing="5" alignment="CENTER" 
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
+                            <Label text="100%" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #00b894;"/>
+                            <Label text="Secure" style="-fx-font-size: 12px; -fx-text-fill: #636e72;"/>
+                        </VBox>
+                        
+                        <VBox spacing="5" alignment="CENTER" 
+                              style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-padding: 15;">
+                            <Label text="Real-time" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e17055;"/>
+                            <Label text="Updates" style="-fx-font-size: 12px; -fx-text-fill: #636e72;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="15"
+              style="-fx-background-color: rgba(45, 52, 54, 0.95); -fx-padding: 15 25;">
+            <Label text="Need help? Contact support@telehealth.com"
+                   style="-fx-text-fill: #ddd; -fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🚪 Logout" onAction="#handleLogout"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                           -fx-background-radius: 8; -fx-font-size: 13px; -fx-padding: 8 16;
+                           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);"/>
+        </HBox>
+    </bottom>
+</BorderPane>

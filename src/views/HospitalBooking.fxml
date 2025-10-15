@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.HospitalBookingController"
+            prefWidth="1050" prefHeight="700"
+            style="-fx-background-color: linear-gradient(to right, #fd79a8, #e84393);">
+
+    <top>
+        <HBox alignment="CENTER" spacing="20" 
+              style="-fx-background-color: #2d3436; -fx-padding: 15;">
+            <Label text="Hospital and Clinic Referral System"
+                   style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" />
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="20" style="-fx-padding: 20;">
+            <!-- Main Form -->
+            <VBox spacing="15" prefWidth="600"
+                  style="-fx-background-color: white; -fx-background-radius: 15; 
+                         -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                
+                <Label text="External Hospital Referral"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+
+                <!-- Patient and Doctor Info -->
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="120"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="200"/>
+                    </columnConstraints>
+
+                    <Label text="Patient:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="patientComboBox" promptText="Select Patient" prefWidth="200"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Referring Doctor:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="doctorNameField" promptText="Doctor Name" prefWidth="200"
+                               style="-fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <Label text="Hospital:" style="-fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="hospitalComboBox" promptText="Select Hospital" prefWidth="200"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <Label text="Department:" style="-fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="departmentComboBox" promptText="Select Department" prefWidth="200"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                    <Label text="Specialty Required:" style="-fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="specialtyField" promptText="e.g. Cardiothoracic Surgery" prefWidth="200"
+                               style="-fx-background-radius: 8;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <!-- Reason for Referral -->
+                <VBox spacing="5">
+                    <Label text="Reason for Referral:" style="-fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+                    <TextArea fx:id="reasonArea" promptText="Detailed reason for hospital referral..."
+                              prefRowCount="4" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Urgency and Date -->
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="120"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="150"/>
+                        <ColumnConstraints halignment="RIGHT" minWidth="100"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="150"/>
+                    </columnConstraints>
+
+                    <Label text="Urgency Level:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="urgencyBox" prefWidth="150"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Preferred Date:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <DatePicker fx:id="preferredDatePicker" prefWidth="150"
+                                style="-fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                    <Label text="Contact Number:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="contactNumberField" promptText="Patient contact" prefWidth="150"
+                               style="-fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <!-- Additional Notes -->
+                <VBox spacing="5">
+                    <Label text="Additional Notes:" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="notesArea" promptText="Any additional information..."
+                              prefRowCount="3" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Action Buttons -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button text="Create Referral" onAction="#handleBookHospital"
+                            style="-fx-background-color: #e84393; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                    
+                    <Button text="Emergency Referral" onAction="#handleEmergencyReferral"
+                            style="-fx-background-color: #d63031; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                    
+                    <Button text="Clear Form" onAction="#handleClearForm"
+                            style="-fx-background-color: #fdcb6e; -fx-text-fill: #2d3436; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                </HBox>
+
+                <Label fx:id="statusLabel" 
+                       style="-fx-font-size: 13px; -fx-padding: 5;"/>
+            </VBox>
+
+            <!-- Side Panel -->
+            <VBox spacing="15" prefWidth="350">
+                <!-- Recent Referrals -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 15; 
+                             -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                    
+                    <Label text="Recent Referrals"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <ListView fx:id="recentReferralsView" prefHeight="200"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Quick Actions -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 15; 
+                             -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                    
+                    <Label text="Quick Actions"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <Button text="Generate Letter" onAction="#handleGenerateReferralLetter"
+                            style="-fx-background-color: #74b9ff; -fx-text-fill: white; 
+                                   -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 8 12;"
+                            prefWidth="290"/>
+                    
+                    <Button text="View Referral Status" onAction="#handleViewReferralStatus"
+                            style="-fx-background-color: #00b894; -fx-text-fill: white; 
+                                   -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 8 12;"
+                            prefWidth="290"/>
+                    
+                    <Separator/>
+                    
+                    <Button text="Back to Dashboard" onAction="#goBackToDashboard"
+                            style="-fx-background-color: #636e72; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 16;"
+                            prefWidth="290"/>
+                </VBox>
+
+                <!-- Hospital Directory -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 15; 
+                             -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                    
+                    <Label text="Hospital Directory"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <VBox spacing="5" style="-fx-font-size: 12px;">
+                        <Label text="• City General Hospital - Emergency Care"/>
+                        <Label text="• Heart Specialist Center - Cardiology"/>
+                        <Label text="• Children's Hospital - Pediatrics"/>
+                        <Label text="• Cancer Treatment Center - Oncology"/>
+                        <Label text="• Orthopedic Institute - Bone and Joint"/>
+                        <Label text="• University Medical - Research"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

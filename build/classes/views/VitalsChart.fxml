@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.VitalsChartController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: linear-gradient(to right, #c6ffdd, #fbd786, #f7797d);">
+
+    <top>
+        <Label text="📊 Your Vitals Overview"
+               style="-fx-font-size: 26px;
+                      -fx-font-weight: bold;
+                      -fx-text-fill: #2d3436;
+                      -fx-padding: 20;"
+               BorderPane.alignment="CENTER" />
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="20">
+            <BarChart fx:id="barChart" title="Comparison with Normal Ranges"
+                      categoryGap="25" barGap="8" prefWidth="700" prefHeight="400"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 15;
+                             -fx-padding: 20;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.3, 0, 4);">
+
+                <xAxis>
+                    <CategoryAxis label="Vital Signs" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Measured Value" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
+            <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                    style="-fx-background-color: #2d3436;
+                           -fx-text-fill: white;
+                           -fx-font-size: 14px;
+                           -fx-background-radius: 10;
+                           -fx-padding: 10 20;" />
+        </HBox>
+    </bottom>
+</BorderPane>

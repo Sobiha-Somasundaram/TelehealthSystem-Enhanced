@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.BookConsultationController"
+            prefWidth="800" prefHeight="550"
+            style="-fx-background-color: linear-gradient(to right, #d4fc79, #96e6a1);">
+
+    <center>
+        <VBox alignment="CENTER" spacing="15" maxWidth="400"
+              style="-fx-background-color: white;
+                     -fx-background-radius: 20;
+                     -fx-padding: 35;
+                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 4);">
+
+            <Label text="🗓️ Book TeleHealth Consultation"
+                   style="-fx-font-size: 20px;
+                          -fx-text-fill: #2c3e50;
+                          -fx-font-weight: bold;" />
+
+            <TextField fx:id="patientNameField" promptText="👤 Patient Name"
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
+
+            <TextField fx:id="specialistField" promptText="👨‍⚕️ Specialist Name"
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
+
+            <DatePicker fx:id="datePicker"
+                        style="-fx-background-radius: 10; -fx-padding: 8; -fx-font-size: 14px;" />
+
+            <ComboBox fx:id="timeSlotBox" promptText="⏰ Select Time Slot"
+                      style="-fx-background-radius: 10; -fx-padding: 8; -fx-font-size: 14px;" />
+
+            <Label fx:id="statusLabel"
+                   style="-fx-text-fill: green; -fx-font-size: 12px;" />
+
+            <Button text="✅ Book Appointment" onAction="#handleBook"
+                    style="-fx-background-color: #3498db;
+                           -fx-text-fill: white;
+                           -fx-font-size: 14px;
+                           -fx-background-radius: 10;
+                           -fx-padding: 8 16;" />
+
+            <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                    style="-fx-background-color: #777;
+                           -fx-text-fill: white;
+                           -fx-font-size: 13px;
+                           -fx-background-radius: 10;
+                           -fx-padding: 6 14;" />
+        </VBox>
+    </center>
+</BorderPane>

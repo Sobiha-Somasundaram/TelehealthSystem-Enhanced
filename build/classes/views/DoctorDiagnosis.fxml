@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.DoctorDiagnosisController"
+            prefWidth="1100" prefHeight="750"
+            style="-fx-background-color: linear-gradient(to right, #a29bfe, #6c5ce7);">
+
+    <top>
+        <HBox alignment="CENTER" spacing="20" 
+              style="-fx-background-color: #2d3436; -fx-padding: 15;">
+            <Label text="Doctor Diagnosis and Treatment Records"
+                   style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" />
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="15" style="-fx-padding: 20;">
+            <!-- Main Form -->
+            <VBox spacing="15" prefWidth="650"
+                  style="-fx-background-color: white; -fx-background-radius: 15; 
+                         -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                
+                <Label text="Patient Diagnosis Form"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+
+                <!-- Patient and Doctor Info -->
+                <GridPane hgap="15" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="120"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="200"/>
+                        <ColumnConstraints halignment="RIGHT" minWidth="80"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="120"/>
+                    </columnConstraints>
+
+                    <Label text="Patient:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="patientComboBox" promptText="Select Patient" prefWidth="200"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Apt ID:" style="-fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <TextField fx:id="appointmentIdField" editable="false" prefWidth="120"
+                               style="-fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                    <Label text="Doctor:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="doctorNameField" promptText="Doctor Name" prefWidth="200"
+                               style="-fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    
+                    <Label text="Severity:" style="-fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                    <ComboBox fx:id="severityBox" prefWidth="120"
+                              style="-fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                </GridPane>
+
+                <!-- Symptoms -->
+                <VBox spacing="5">
+                    <Label text="Patient Symptoms:" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="symptomsArea" promptText="Describe patient symptoms..."
+                              prefRowCount="3" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Diagnosis -->
+                <VBox spacing="5">
+                    <Label text="Diagnosis:" style="-fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+                    <TextArea fx:id="diagnosisArea" promptText="Enter detailed diagnosis..."
+                              prefRowCount="4" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Prescription -->
+                <VBox spacing="5">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Prescription:" style="-fx-font-weight: bold; -fx-text-fill: #00b894;"/>
+                        <Button text="Generate Template" onAction="#handleGeneratePrescription"
+                                style="-fx-background-color: #00cec9; -fx-text-fill: white; 
+                                       -fx-background-radius: 6; -fx-font-size: 12px; -fx-padding: 4 8;"/>
+                    </HBox>
+                    <TextArea fx:id="prescriptionArea" promptText="Enter prescription details..."
+                              prefRowCount="4" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Treatment Plan -->
+                <VBox spacing="5">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Treatment Plan:" style="-fx-font-weight: bold; -fx-text-fill: #6c5ce7;"/>
+                        <Button text="Generate Plan" onAction="#handleGenerateTreatmentPlan"
+                                style="-fx-background-color: #a29bfe; -fx-text-fill: white; 
+                                       -fx-background-radius: 6; -fx-font-size: 12px; -fx-padding: 4 8;"/>
+                    </HBox>
+                    <TextArea fx:id="treatmentPlanArea" promptText="Enter treatment plan..."
+                              prefRowCount="3" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Follow-up Instructions -->
+                <VBox spacing="5">
+                    <Label text="Follow-up Instructions:" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="followUpArea" promptText="Enter follow-up instructions..."
+                              prefRowCount="2" wrapText="true"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Status -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Status:" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="statusBox" prefWidth="120"
+                              style="-fx-background-radius: 8;"/>
+                </HBox>
+
+                <!-- Action Buttons -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button text="Save Diagnosis" onAction="#handleSaveDiagnosis"
+                            style="-fx-background-color: #00b894; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                    
+                    <Button text="Clear Form" onAction="#handleClearForm"
+                            style="-fx-background-color: #fdcb6e; -fx-text-fill: #2d3436; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                    
+                    <Button text="Patient History" onAction="#handleViewPatientHistory"
+                            style="-fx-background-color: #74b9ff; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 20;"/>
+                </HBox>
+
+                <Label fx:id="statusLabel" 
+                       style="-fx-font-size: 13px; -fx-padding: 5;"/>
+            </VBox>
+
+            <!-- Side Panel -->
+            <VBox spacing="15" prefWidth="300">
+                <!-- Recent Diagnoses -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 15; 
+                             -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                    
+                    <Label text="Recent Diagnoses"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <ListView fx:id="recentDiagnosesView" prefHeight="200"
+                              style="-fx-background-radius: 8;"/>
+                </VBox>
+
+                <!-- Quick Actions -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 15; 
+                             -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 4);">
+                    
+                    <Label text="Quick Actions"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                    
+                    <Button text="Back to Dashboard" onAction="#goBackToDashboard"
+                            style="-fx-background-color: #636e72; -fx-text-fill: white; 
+                                   -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 16;"
+                            prefWidth="260"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

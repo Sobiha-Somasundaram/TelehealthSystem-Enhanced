@@ -1,0 +1,70 @@
+/* Background Gradient */
+.background {
+    -fx-background-color: linear-gradient(to bottom right, #8e2de2, #4a00e0);
+}
+
+/* Glassmorphic Card Style */
+.glass-card, #signupBox {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 20;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 15, 0, 0, 8);
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1.5;
+    -fx-alignment: center;
+    -fx-max-width: 350px;
+}
+
+/* Header Text */
+.header-label {
+    -fx-font-size: 26px; /* Standard JavaFX property */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 20 0;
+}
+
+/* Text Fields */
+.input-field {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px; /* Standard JavaFX property */
+    -fx-prompt-text-fill: #999;
+}
+
+/* Primary Button */
+.button {
+    -fx-background-color: #6a11cb;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 3);
+}
+
+.button:hover {
+    -fx-background-color: #2575fc;
+}
+
+/* Secondary Button */
+.button-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 1.5;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.button-secondary:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Error Label */
+.error-label {
+    -fx-text-fill: #ff4d4d;
+    -fx-font-size: 12px;
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.HealthReportController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: linear-gradient(to right, #ffffff, #d7e1ec);">
+
+    <center>
+        <VBox alignment="CENTER" spacing="20" maxWidth="600"
+              style="-fx-background-color: white;
+                     -fx-background-radius: 18;
+                     -fx-padding: 30;
+                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 4);">
+
+            <Label text="🩺 Health Summary Report"
+                   style="-fx-font-size: 24px;
+                          -fx-font-weight: bold;
+                          -fx-text-fill: #34495e;" />
+
+            <TextArea fx:id="reportArea" editable="false" wrapText="true" prefHeight="350"
+                      style="-fx-background-radius: 10;
+                             -fx-padding: 12;
+                             -fx-font-size: 14px;" />
+
+            <HBox spacing="20" alignment="CENTER">
+                <Button text="💾 Save Report" onAction="#handleSaveReport"
+                        style="-fx-background-color: #27ae60;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14px;
+                               -fx-background-radius: 10;
+                               -fx-padding: 10 18;" />
+
+                <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                        style="-fx-background-color: #7f8c8d;
+                               -fx-text-fill: white;
+                               -fx-background-radius: 10;
+                               -fx-padding: 10 18;" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

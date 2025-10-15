@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.StaffBookingController"
+            prefWidth="1100" prefHeight="750"
+            style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);">
+
+    <top>
+        <VBox spacing="15">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="15"
+                  style="-fx-background-color: rgba(45, 52, 54, 0.95); -fx-padding: 20;">
+                <Label text="Staff Booking Management"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Healthcare Staff Portal"
+                       style="-fx-text-fill: #ddd; -fx-font-size: 14px;" />
+            </HBox>
+            
+            <!-- Filter Controls -->
+            <HBox spacing="20" alignment="CENTER_LEFT"
+                  style="-fx-background-color: rgba(255, 255, 255, 0.95); -fx-padding: 15; -fx-background-radius: 15;">
+                
+                <Label text="Search and Filter:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                
+                <TextField fx:id="searchField" promptText="Search by patient or specialist name..."
+                           style="-fx-background-radius: 10; -fx-padding: 8; -fx-font-size: 14px; 
+                                  -fx-border-color: #ddd; -fx-border-radius: 10;" 
+                           prefWidth="280"/>
+                
+                <ComboBox fx:id="statusFilterBox" promptText="Filter by Status"
+                          style="-fx-background-radius: 10; -fx-font-size: 14px;" 
+                          prefWidth="160"/>
+                
+                <DatePicker fx:id="dateFilterPicker" promptText="Filter by Date"
+                            style="-fx-background-radius: 10; -fx-font-size: 14px;" 
+                            prefWidth="160"/>
+                
+                <Button text="Refresh" onAction="#handleRefresh"
+                        style="-fx-background-color: linear-gradient(to bottom, #00b894, #00a085);
+                               -fx-text-fill: white; -fx-background-radius: 10; 
+                               -fx-font-size: 13px; -fx-padding: 8 16;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 25;">
+            <!-- Main Table Container -->
+            <VBox spacing="15"
+                  style="-fx-background-color: rgba(255, 255, 255, 0.98); 
+                         -fx-background-radius: 20; -fx-padding: 25;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0.3, 0, 5);">
+                
+                <Label text="Appointment Management"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
+                
+                <TableView fx:id="appointmentsTable" prefHeight="400"
+                           style="-fx-background-color: white; -fx-background-radius: 12;
+                                  -fx-border-color: #e1e8ed; -fx-border-radius: 12;">
+                    
+                    <columns>
+                        <TableColumn fx:id="patientColumn" text="Patient Name" prefWidth="180"/>
+                        <TableColumn fx:id="specialistColumn" text="Specialist" prefWidth="180"/>
+                        <TableColumn fx:id="dateColumn" text="Date" prefWidth="120"/>
+                        <TableColumn fx:id="timeColumn" text="Time" prefWidth="100"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="140"/>
+                    </columns>
+                    
+                    <placeholder>
+                        <VBox spacing="10" alignment="CENTER">
+                            <Label text="No Data" style="-fx-font-size: 48px;"/>
+                            <Label text="No appointments found" style="-fx-font-size: 16px; -fx-text-fill: #636e72;"/>
+                            <Label text="Try adjusting your search filters" style="-fx-font-size: 12px; -fx-text-fill: #999;"/>
+                        </VBox>
+                    </placeholder>
+                </TableView>
+
+                <!-- Action Buttons -->
+                <HBox spacing="20" alignment="CENTER" style="-fx-padding: 15 0 0 0;">
+                    <Button text="Modify Booking" onAction="#handleModifyBooking"
+                            style="-fx-background-color: linear-gradient(to bottom, #fdcb6e, #e17055);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 12; -fx-padding: 12 18;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                    
+                    <Button text="Cancel Booking" onAction="#handleCancelBooking"
+                            style="-fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 12; -fx-padding: 12 18;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                    
+                    <Button text="View Details" onAction="#handleViewDetails"
+                            style="-fx-background-color: linear-gradient(to bottom, #74b9ff, #0984e3);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 12; -fx-padding: 12 18;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                    
+                    <Separator orientation="VERTICAL" prefHeight="30"/>
+                    
+                    <Button text="Back to Dashboard" onAction="#goBackToDashboard"
+                            style="-fx-background-color: linear-gradient(to bottom, #636e72, #2d3436);
+                                   -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
+                                   -fx-background-radius: 12; -fx-padding: 12 18;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
+                </HBox>
+
+                <!-- Status Label -->
+                <HBox alignment="CENTER">
+                    <Label fx:id="statusLabel" 
+                           style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-color: #f8f9fa; 
+                                  -fx-background-radius: 8; -fx-text-fill: #495057;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

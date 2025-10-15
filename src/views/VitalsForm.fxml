@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.VitalsFormController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);">
+
+    <center>
+        <VBox alignment="CENTER" spacing="16" fx:id="mainContainer"
+              style="-fx-background-color: rgba(255,255,255,0.95);
+                     -fx-background-radius: 20;
+                     -fx-padding: 35;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0.5, 0, 5);"
+              maxWidth="600" maxHeight="580">
+
+            <Label text="🧠 Vitals Monitoring"
+                   style="-fx-font-size: 26px;
+                          -fx-text-fill: #5c2b9b;
+                          -fx-font-weight: bold;" />
+
+            <GridPane hgap="20" vgap="15" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                </columnConstraints>
+
+                <Label text="❤️ Pulse:" style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
+                <TextField fx:id="pulseField" promptText="Pulse Rate (bpm)"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="🌡️ Temperature:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="1"/>
+                <TextField fx:id="temperatureField" promptText="Temperature (°C)"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="💨 Respiration:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="2"/>
+                <TextField fx:id="respirationField" promptText="Breaths per min"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="🩺 Blood Pressure:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="3"/>
+                <TextField fx:id="bpField" promptText="e.g. 120/80"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Label text="⚖️ Weight:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="4"/>
+                <TextField fx:id="weightField" promptText="Weight (kg)"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <Label text="📏 Height:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="5"/>
+                <TextField fx:id="heightField" promptText="Height (cm)"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                <Label text="🫁 Oxygen:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="6"/>
+                <TextField fx:id="oxygenField" promptText="O2 Saturation (%)"
+                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <HBox spacing="20" alignment="CENTER">
+                <Button fx:id="sendButton" text="📤 Send to Doctor" onAction="#handleSend"
+                        style="-fx-background-color: #5c2b9b;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14px;
+                               -fx-background-radius: 10;
+                               -fx-padding: 10 20;" />
+
+                <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                        style="-fx-background-color: #888;
+                               -fx-text-fill: white;
+                               -fx-background-radius: 10;
+                               -fx-padding: 8 16;" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

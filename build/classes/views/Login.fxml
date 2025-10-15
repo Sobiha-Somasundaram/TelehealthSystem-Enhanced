@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginController"
+            prefWidth="800" prefHeight="500"
+            style="-fx-background-color: linear-gradient(to bottom right, #c9d6ff, #e2e2e2);">
+
+    <center>
+        <VBox alignment="CENTER" spacing="18" maxWidth="350" maxHeight="420"
+              style="-fx-background-color: rgba(255, 255, 255, 0.85);
+                     -fx-background-radius: 15;
+                     -fx-padding: 30;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0.3, 0, 6);">
+
+            <Label text="🔐 TeleHealth Login"
+                   style="-fx-font-size: 24px;
+                          -fx-font-weight: bold;
+                          -fx-text-fill: #2c3e50;" />
+
+            <TextField fx:id="usernameField" promptText="👤 Username"
+                       style="-fx-background-radius: 10;
+                              -fx-font-size: 14px;
+                              -fx-padding: 10;" />
+
+            <PasswordField fx:id="passwordField" promptText="🔒 Password"
+                           style="-fx-background-radius: 10;
+                                  -fx-font-size: 14px;
+                                  -fx-padding: 10;" />
+
+            <Label fx:id="errorLabel" textFill="red" style="-fx-font-size: 12px;" />
+
+            <Button text="▶ Login" onAction="#handleLogin"
+                    style="-fx-background-color: #3498db;
+                           -fx-text-fill: white;
+                           -fx-font-size: 15px;
+                           -fx-background-radius: 10;
+                           -fx-padding: 10 20;" />
+
+            <Button text="📝 Create Account" onAction="#goToSignup"
+                    style="-fx-background-color: transparent;
+                           -fx-border-color: #3498db;
+                           -fx-text-fill: #3498db;
+                           -fx-font-size: 14px;
+                           -fx-border-radius: 10;
+                           -fx-padding: 8 20;" />
+        </VBox>
+    </center>
+</BorderPane>
