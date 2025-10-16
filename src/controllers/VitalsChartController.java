@@ -10,10 +10,18 @@ import javafx.fxml.FXMLLoader;
 
 import java.util.Map;
 
+/**
+ *
+ * @author USER
+ */
 public class VitalsChartController {
 
     @FXML private BarChart<String, Number> barChart;
 
+    /**
+     *
+     * @param vitals
+     */
     public void setVitalsData(Map<String, String> vitals) {
         XYChart.Series<String, Number> normal = new XYChart.Series<>();
         normal.setName("Normal");

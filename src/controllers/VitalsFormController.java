@@ -2,17 +2,25 @@ package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import utils.SessionData;
 import javafx.scene.Parent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
+import database.DatabaseHelper;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author USER
+ */
 public class VitalsFormController {
 
     @FXML private TextField pulseField;
@@ -22,12 +30,21 @@ public class VitalsFormController {
     @FXML private TextField weightField;
     @FXML private TextField heightField;
     @FXML private TextField oxygenField;
-    
+
+    private int userId;  // <-- logged-in user ID
 
     private Map<String, String> vitalData = new HashMap<>();
-    
-    
-    
+
+    // ======= SET USER ID FROM DASHBOARD =======
+
+    /**
+     *
+     * @param id
+     */
+    public void setUserId(int id) {
+        this.userId = id;
+    }
+
     private String getAlertMessage(Map<String, String> vitals) {
         StringBuilder alert = new StringBuilder();
 
@@ -53,11 +70,10 @@ public class VitalsFormController {
 
         return alert.toString().isEmpty() ? null : alert.toString();
     }
-    
+
     @FXML
     private void handleSend(javafx.event.ActionEvent event) {
-    	
-    	
+        // Collect vitals
         vitalData.put("Pulse", pulseField.getText());
         vitalData.put("Temperature", temperatureField.getText());
         vitalData.put("Respiration", respirationField.getText());
@@ -65,12 +81,9 @@ public class VitalsFormController {
         vitalData.put("Weight", weightField.getText());
         vitalData.put("Height", heightField.getText());
         vitalData.put("Oxygen", oxygenField.getText());
-        
-        SessionData.vitals.clear();
-        SessionData.vitals.putAll(vitalData);
-        
-        String alertMsg = getAlertMessage(vitalData);
 
+        // Validate and show alerts
+        String alertMsg = getAlertMessage(vitalData);
         if (alertMsg != null) {
             Alert alertWarning = new Alert(Alert.AlertType.WARNING);
             alertWarning.setTitle("Vitals Alert");
@@ -79,6 +92,38 @@ public class VitalsFormController {
             alertWarning.showAndWait();
         }
 
+        // ===== Save to Database =====
+        String insertSQL = """
+            INSERT INTO vitals_records
+            (user_id, pulse, temperature, respiration, blood_pressure, weight, height, oxygen)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (Connection conn = DatabaseHelper.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, Integer.parseInt(pulseField.getText()));
+            pstmt.setBigDecimal(3, new BigDecimal(temperatureField.getText()));
+            pstmt.setInt(4, Integer.parseInt(respirationField.getText()));
+            pstmt.setString(5, bpField.getText());
+            pstmt.setBigDecimal(6, new BigDecimal(weightField.getText()));
+            pstmt.setBigDecimal(7, new BigDecimal(heightField.getText()));
+            pstmt.setBigDecimal(8, new BigDecimal(oxygenField.getText()));
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert dbError = new Alert(Alert.AlertType.ERROR);
+            dbError.setTitle("Database Error");
+            dbError.setHeaderText("Failed to save vitals");
+            dbError.setContentText(e.getMessage());
+            dbError.showAndWait();
+            return;
+        }
+
+        // Show confirmation
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Vitals Sent");
         alert.setHeaderText("Vitals sent to your doctor.");
@@ -106,6 +151,19 @@ public class VitalsFormController {
                 }
             }
         });
+
+        // Clear form
+        clearForm();
+    }
+
+    private void clearForm() {
+        pulseField.clear();
+        temperatureField.clear();
+        respirationField.clear();
+        bpField.clear();
+        weightField.clear();
+        heightField.clear();
+        oxygenField.clear();
     }
 
     @FXML

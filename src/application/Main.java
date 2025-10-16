@@ -10,7 +10,7 @@ import database.DatabaseHelper;
 public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
-            DatabaseHelper.initializeDatabase(); // Create DB on launch
+            //DatabaseHelper.initializeDatabase(); // Create DB on launch
 
             Parent root = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
             Scene scene = new Scene(root);

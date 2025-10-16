@@ -117,7 +117,7 @@ public class HospitalBookingController {
     }
 
     private void loadPatients() {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT DISTINCT patient_name FROM appointments 
                 WHERE status = 'SCHEDULED' OR status = 'COMPLETED'
@@ -141,7 +141,7 @@ public class HospitalBookingController {
     private void loadRecentReferrals() {
         recentReferralsView.getItems().clear();
         
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT patient_name, hospital_name, department, urgency_level, status, referral_date 
                 FROM hospital_referrals 
@@ -235,7 +235,7 @@ public class HospitalBookingController {
     }
 
     private void saveReferralToDatabase(HospitalReferral referral) throws Exception {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 INSERT INTO hospital_referrals (
                     patient_name, referring_doctor_name, hospital_name, department,
@@ -359,7 +359,7 @@ public class HospitalBookingController {
     }
 
     private void showReferralHistory(String patientName) {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT * FROM hospital_referrals 
                 WHERE patient_name = ? 

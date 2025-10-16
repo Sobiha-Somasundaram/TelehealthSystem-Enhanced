@@ -71,7 +71,7 @@ public class DoctorDiagnosisController {
     }
 
     private void loadPatients() {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT DISTINCT patient_name FROM appointments 
                 WHERE status = 'SCHEDULED' OR status = 'COMPLETED'
@@ -93,7 +93,7 @@ public class DoctorDiagnosisController {
     }
 
     private void loadPatientInfo(String patientName) {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT id FROM appointments 
                 WHERE patient_name = ? AND (status = 'SCHEDULED' OR status = 'COMPLETED')
@@ -116,7 +116,7 @@ public class DoctorDiagnosisController {
     private void loadRecentDiagnoses() {
         recentDiagnosesView.getItems().clear();
         
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT patient_name, diagnosis_text, recorded_date 
                 FROM diagnoses 
@@ -192,7 +192,7 @@ public class DoctorDiagnosisController {
     }
 
     private void saveDiagnosisToDatabase(Diagnosis diagnosis) throws Exception {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 INSERT INTO diagnoses (
                     appointment_id, patient_name, doctor_name, diagnosis_text, 
@@ -337,7 +337,7 @@ public class DoctorDiagnosisController {
     }
 
     private void showPatientHistory(String patientName) {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 SELECT * FROM diagnoses 
                 WHERE patient_name = ? 

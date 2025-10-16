@@ -14,55 +14,69 @@ import javafx.stage.Stage;
 
 public class LoginController {
 
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private Label errorLabel;
-    private void showAlert(Alert.AlertType alertType, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle("Login Status");
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private Button btnLogin;
+
+    // ==================== ALERT HELPER ====================
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
+    // ==================== LOGIN HANDLER ====================
     @FXML
     private void handleLogin(ActionEvent event) {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            errorLabel.setText("Please fill all fields.");
+            errorLabel.setText("Please enter username and password.");
             return;
         }
 
-        try (Connection conn = DatabaseHelper.connect()) {
-            String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-            PreparedStatement pstmt = conn.prepareStatement(query);
+        String query = "SELECT user_id, name, role FROM users WHERE username = ? AND password = ?";
+
+        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement pstmt = conn.prepareStatement(query)) {
+
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-
             ResultSet rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                // Login success - go to dashboard
-            	FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
-            	Parent root = loader.load(); // load the FXML
+                // ==================== LOGIN SUCCESS ====================
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
+                Parent root = loader.load();
 
-            	DashboardController controller = loader.getController(); // get controller instance
-            	controller.setUsername(rs.getString("name")); // pass name to dashboard
+                // Pass username and role to DashboardController
+                DashboardController controller = loader.getController();
+                controller.setUserInfo(rs.getInt("user_id"), rs.getString("name"), rs.getString("role"));
 
-            	Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            	stage.setScene(new Scene(root));
-            	stage.setTitle("TeleHealth - Dashboard");
-            	stage.show();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("TeleHealth - Dashboard");
+                stage.show();
+
             } else {
-                errorLabel.setText("Invalid credentials.");
+                errorLabel.setText("Login Failed. Invalid username or password.");
             }
+
         } catch (Exception e) {
-            e.printStackTrace();  // ✅ Add this for debugging
-            showAlert(Alert.AlertType.ERROR, "Login failed:\n" + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Connection Error",
+                    "Unable to connect to the database. Please try again later.");
+            e.printStackTrace();
         }
     }
 
+    // ==================== NAVIGATION TO SIGNUP ====================
     @FXML
     private void goToSignup(ActionEvent event) {
         try {
@@ -70,9 +84,10 @@ public class LoginController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("TeleHealth - Signup");
+            stage.show();
         } catch (Exception e) {
-            e.printStackTrace();  // ✅ Add this for debugging
-            showAlert(Alert.AlertType.ERROR, "Login failed:\n" + e.getMessage());
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Unable to open Signup page.");
         }
     }
 }

@@ -1,8 +1,8 @@
 package controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -11,71 +11,236 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 
-/**
- * Enhanced Dashboard Controller with navigation to all Assessment 2 features
- * Includes patient features, staff management, and doctor functionality
- */
 public class DashboardController {
 
     @FXML
     private Label welcomeLabel;
 
-    private String username;
+    // Sections
+    @FXML
+    private VBox patientSection;
+    @FXML
+    private VBox staffSection;
+    @FXML
+    private VBox doctorSection;
 
-    // This method is required
+    // Buttons (patient)
+    @FXML
+    private Button bookConsultationBtn;
+    @FXML
+    private Button prescriptionRefillBtn;
+    @FXML
+    private Button vitalsMonitoringBtn;
+    @FXML
+    private Button healthReportBtn;
+
+    // Buttons (staff)
+    @FXML
+    private Button staffBookingBtn;
+
+    // Buttons (doctor)
+    @FXML
+    private Button doctorDiagnosisBtn;
+    @FXML
+    private Button hospitalBookingBtn;
+
+    private int userId;
+    private String username;
+    private String userRole;
+    
+    private int loggedInUserId;
+    private String loggedInUserName;
+
+
+    // ============ SET USER INFO ============
+    public void setUserInfo(int id, String name, String role) {
+        this.userId = id;
+        this.username = name;
+        this.userRole = role;
+
+        if (welcomeLabel != null) {
+            welcomeLabel.setText("Welcome, " + username + "!");
+        }
+
+        applyRolePermissions();
+    }
+    public void setLoggedInUser(int userId, String username) {
+    this.loggedInUserId = userId;
+    this.loggedInUserName = username;
+}
+
+
     public void setUsername(String name) {
         this.username = name;
         if (welcomeLabel != null) {
             welcomeLabel.setText("Welcome, " + username + "!");
         }
     }
+
+    public void setUserRole(String role) {
+        this.userRole = role;
+        applyRolePermissions();
+    }
+
+    // ============ APPLY ROLE PERMISSIONS ============
+    private void applyRolePermissions() {
+        // First disable everything by default
+        disableAllButtons();
+
+        if (userRole == null) {
+            return;
+        }
+
+        switch (userRole.toLowerCase()) {
+            case "patient":
+                enablePatientButtons();
+                break;
+            case "doctor":
+                enableDoctorButtons();
+                break;
+            case "admin":
+            case "staff":
+                enableStaffButtons();
+                break;
+            default:
+                enablePatientButtons(); // Minimal access fallback
+        }
+    }
+
+    // ============ Helper Methods ============
+    private void disableAllButtons() {
+        bookConsultationBtn.setDisable(true);
+        prescriptionRefillBtn.setDisable(true);
+        vitalsMonitoringBtn.setDisable(true);
+        healthReportBtn.setDisable(true);
+        staffBookingBtn.setDisable(true);
+        doctorDiagnosisBtn.setDisable(true);
+        hospitalBookingBtn.setDisable(true);
+    }
+
+    private void enablePatientButtons() {
+        bookConsultationBtn.setDisable(false);
+        prescriptionRefillBtn.setDisable(false);
+        vitalsMonitoringBtn.setDisable(false);
+        healthReportBtn.setDisable(false);
+    }
+
+    private void enableStaffButtons() {
+        staffBookingBtn.setDisable(false);
+    }
+
+    private void enableDoctorButtons() {
+        doctorDiagnosisBtn.setDisable(false);
+        hospitalBookingBtn.setDisable(false);
+    }
+
+    // ============ Navigation Methods ============
+    @FXML
+    private void goToBookConsultation(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/BookConsultation.fxml"));
+            Parent root = loader.load();
+
+            // Pass the logged-in user's info to BookConsultationController
+            controllers.BookConsultationController controller = loader.getController();
+            controller.setPatientInfo(userId, username);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Book Consultation");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load BookConsultation.fxml");
+        }
+    }
+
+    @FXML
+    private void goToVitalsMonitoring(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/VitalsForm.fxml"));
+            Parent root = loader.load();
+
+            // Pass logged-in user's ID to VitalsFormController
+            VitalsFormController controller = loader.getController();
+            controller.setUserId(userId);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Vitals Monitoring");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void goToPrescriptionRefill(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PrescriptionRefill.fxml"));
+            Parent root = loader.load();
+
+            // Pass logged-in user's info to PrescriptionRefillController
+            PrescriptionRefillController controller = loader.getController();
+            controller.setPatientInfo(userId, username);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Prescription Refill");
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+   
+        @FXML
+private void goToHealthReport() {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/HealthReport.fxml"));
+        Parent root = loader.load();
+
+        HealthReportController controller = loader.getController();
+        controller.setPatientInfo(loggedInUserId, loggedInUserName);
+
+        Stage stage = (Stage) healthReportBtn.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("TeleHealth System - Health Report");
+        stage.show();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        showAlert(Alert.AlertType.ERROR, "Navigation Error", "Failed to open Health Report page: " + e.getMessage());
+    }
+}
+
     
-    // Patient Features
-    @FXML
-    private void goToBookConsultation(javafx.event.ActionEvent event) {
-        navigateToView("/views/BookConsultation.fxml", "Book Consultation", event);
-    }
 
     @FXML
-    private void goToVitalsMonitoring(javafx.event.ActionEvent event) {
-        navigateToView("/views/VitalsForm.fxml", "Vitals Monitoring", event);
-    }
-
-    @FXML
-    private void goToPrescriptionRefill(javafx.event.ActionEvent event) {
-        navigateToView("/views/PrescriptionRefill.fxml", "Prescription Refill", event);
-    }
-    
-    @FXML
-    private void goToHealthReport(javafx.event.ActionEvent event) {
-        navigateToView("/views/HealthReport.fxml", "Health Report", event);
-    }
-
-    // Staff Features (NEW for Assessment 2)
-    @FXML
-    private void goToStaffBooking(javafx.event.ActionEvent event) {
+    private void goToStaffBooking(ActionEvent event) {
         navigateToView("/views/StaffBooking.fxml", "Staff Booking Management", event);
     }
 
-    // Doctor Features (NEW for Assessment 2)
     @FXML
-    private void goToDoctorDiagnosis(javafx.event.ActionEvent event) {
+    private void goToDoctorDiagnosis(ActionEvent event) {
         navigateToView("/views/DoctorDiagnosis.fxml", "Doctor Diagnosis", event);
     }
 
     @FXML
-    private void goToHospitalBooking(javafx.event.ActionEvent event) {
+    private void goToHospitalBooking(ActionEvent event) {
         navigateToView("/views/HospitalBooking.fxml", "Hospital Booking", event);
     }
 
-    // System Functions
     @FXML
     private void handleLogout(ActionEvent event) {
         navigateToView("/views/Login.fxml", "TeleHealth - Login", event);
     }
 
-    // Helper method for navigation
-    private void navigateToView(String fxmlPath, String title, javafx.event.ActionEvent event) {
+    // ============ Navigation Helper ============
+    private void navigateToView(String fxmlPath, String title, ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
@@ -88,11 +253,25 @@ public class DashboardController {
             System.err.println("Failed to load view: " + fxmlPath);
         }
     }
-    
+
+    // ============ Initialization ============
     @FXML
     public void initialize() {
-        if (username != null) {
+        // Default: disable everything until role is applied
+        disableAllButtons();
+
+        if (username != null && welcomeLabel != null) {
             welcomeLabel.setText("Welcome, " + username + "!");
         }
     }
+
+    
+    private void showAlert(Alert.AlertType type, String title, String message) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(message);
+    alert.showAndWait();
+}
+
 }

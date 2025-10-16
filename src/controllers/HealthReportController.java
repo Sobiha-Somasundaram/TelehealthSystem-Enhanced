@@ -1,127 +1,148 @@
 package controllers;
 
+import database.DatabaseHelper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.Parent;
-import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import models.HealthReport;
+import models.Diagnosis;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-import utils.SessionData;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Map;
-
+/**
+ * HealthReportController
+ * ---------------------------------------------------------------
+ * Shows the logged-in patient's health reports.
+ * Fetches from diagnoses & health_reports tables.
+ */
 public class HealthReportController {
 
-    @FXML private TextArea reportArea;
+    @FXML
+    private Label lblPatientName;
 
     @FXML
-    public void initialize() {
-        generateHealthReport();
-    }
-
-    private void generateHealthReport() {
-        StringBuilder report = new StringBuilder();
-
-        report.append("🩺 TELEHEALTH SYSTEM - HEALTH REPORT\n");
-        report.append("------------------------------------------\n");
-        report.append("Patient Name     : ").append(SessionData.patientName != null ? SessionData.patientName : "N/A").append("\n");
-        report.append("Doctor/Specialist: Dr. ").append(SessionData.specialistName != null ? SessionData.specialistName : "N/A").append("\n");
-        report.append("Appointment Date : ").append(SessionData.appointmentDate != null ? SessionData.appointmentDate.toString() : "N/A").append("\n");
-        report.append("Appointment Time : ").append(SessionData.appointmentTime != null ? SessionData.appointmentTime : "N/A").append("\n");
-        report.append("Report Generated : ").append(LocalDateTime.now()).append("\n\n");
-
-        report.append("📦 PRESCRIPTION REFILL\n");
-        report.append("• Medication Name : ").append(SessionData.medicationName != null ? SessionData.medicationName : "N/A").append("\n");
-        report.append("• Quantity        : ").append(SessionData.medicationQuantity != null ? SessionData.medicationQuantity : "N/A").append("\n\n");
-
-        report.append("💓 VITAL SIGNS\n");
-        if (SessionData.vitals.isEmpty()) {
-            report.append("No vitals recorded.\n");
-        } else {
-            report.append(getVitalLine("Pulse", SessionData.vitals.get("Pulse"), "60–100 bpm"));
-            report.append(getVitalLine("Temperature", SessionData.vitals.get("Temperature"), "36.0–37.5 °C"));
-            report.append(getVitalLine("Respiration", SessionData.vitals.get("Respiration"), "12–20 breaths/min"));
-            report.append(getVitalLine("Oxygen", SessionData.vitals.get("Oxygen"), "95–100%"));
-        }
-
-        report.append("\n🩺 DOCTOR'S ADVICE\n");
-        report.append(generateDoctorAdvice());
-
-        reportArea.setText(report.toString());
-    }
-
-    private String getVitalLine(String name, String value, String normalRange) {
-        if (value == null || value.isEmpty()) return String.format("• %s: Not Provided\n", name);
-        double val = Double.parseDouble(value);
-        String alert = switch (name) {
-            case "Pulse" -> val < 60 ? "Low Alert" : (val > 100 ? "High Alert" : "Normal");
-            case "Temperature" -> val < 36 ? "Low Alert" : (val > 37.5 ? "High Alert" : "Normal");
-            case "Respiration" -> val < 12 ? "Low Alert" : (val > 20 ? "High Alert" : "Normal");
-            case "Oxygen" -> val < 95 ? "Low Alert" : "Normal";
-            default -> "Normal";
-        };
-
-        return String.format("• %s: %s (%s) → %s\n", name, value, normalRange, alert);
-    }
-
-    private String generateDoctorAdvice() {
-        Map<String, String> vitals = SessionData.vitals;
-        if (vitals.isEmpty()) return "No vitals submitted.";
-
-        double temp = Double.parseDouble(vitals.getOrDefault("Temperature", "0"));
-        double pulse = Double.parseDouble(vitals.getOrDefault("Pulse", "0"));
-        double oxygen = Double.parseDouble(vitals.getOrDefault("Oxygen", "0"));
-
-        if (temp > 37.5) return "You have a high temperature. Rest well and stay hydrated.";
-        if (pulse > 100) return "Your pulse rate is high. Avoid physical exertion.";
-        if (oxygen < 95) return "Your oxygen saturation is low. Breathe deeply and contact a doctor.";
-
-        return "Your vital signs are within normal range. Keep maintaining a healthy lifestyle.";
-    }
+    private TableView<HealthReport> tableHealthReport;
 
     @FXML
-    private void handleSaveReport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Health Report");
-        fileChooser.setInitialFileName("HealthReport.txt");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+    private TableColumn<HealthReport, String> colDate;
 
-        File file = fileChooser.showSaveDialog(new Stage());
-        if (file != null) {
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(reportArea.getText());
+    @FXML
+    private TableColumn<HealthReport, String> colDoctor;
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Report saved successfully.", ButtonType.OK);
-                alert.setTitle("Success");
-                alert.showAndWait();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to save report.", ButtonType.OK);
-                alert.showAndWait();
+    @FXML
+    private TableColumn<HealthReport, String> colDiagnosis;
+
+    @FXML
+    private TableColumn<HealthReport, String> colPrescription;
+
+    private int patientId;
+    private String patientName;
+    
+    private int loggedInUserId;
+    private String loggedInUserName;
+
+    private ObservableList<HealthReport> reportList = FXCollections.observableArrayList();
+
+    /**
+     * Sets logged-in patient info from Dashboard.
+     */
+    public void setPatientInfo(int id, String name) {
+        this.patientId = id;
+        this.patientName = name;
+        lblPatientName.setText(name);
+        loadHealthReports();
+    }
+
+    /**
+     * Loads health reports for the logged-in patient.
+     */
+    private void loadHealthReports() {
+        reportList.clear();
+
+        String sql = "SELECT d.diagnosis_id, u1.name AS patient_name, u2.name AS doctor_name, " +
+             "d.diagnosis, d.prescription, d.referral, d.created_at AS diagnosis_date " +
+             "FROM diagnoses d " +
+             "JOIN users u1 ON d.patient_id = u1.user_id " +
+             "JOIN users u2 ON d.doctor_id = u2.user_id " +
+             "WHERE d.patient_id = ?";
+
+
+
+        try (Connection conn = DatabaseHelper.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                HealthReport report = new HealthReport(
+                        rs.getString("diagnosis_date"),
+                        rs.getString("doctor_name"),
+                        rs.getString("diagnosis_details"),
+                        rs.getString("prescription")
+                );
+                reportList.add(report);
             }
-        }
-    }
 
-    @FXML
-    private void goBackToDashboard(javafx.event.ActionEvent event) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/views/Dashboard.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("TeleHealth - Dashboard");
-            stage.show();
-        } catch (Exception e) {
+            // Bind table columns
+            colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+            colDoctor.setCellValueFactory(new PropertyValueFactory<>("doctor"));
+            colDiagnosis.setCellValueFactory(new PropertyValueFactory<>("diagnosis"));
+            colPrescription.setCellValueFactory(new PropertyValueFactory<>("prescription"));
+
+            tableHealthReport.setItems(reportList);
+
+        } catch (SQLException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load health reports: " + e.getMessage());
         }
     }
     
+    @FXML
+private void goBackToDashboard(ActionEvent event) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
+        Parent root = loader.load();
+
+        // Pass back the logged-in user details if needed
+        DashboardController controller = loader.getController();
+        controller.setLoggedInUser(loggedInUserId, loggedInUserName);
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("TeleHealth System - Dashboard");
+        stage.show();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Navigation Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Failed to return to Dashboard: " + e.getMessage());
+        alert.showAndWait();
+    }
+}
+
+
+    /**
+     * Utility alert popup.
+     */
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

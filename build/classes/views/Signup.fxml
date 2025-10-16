@@ -30,6 +30,15 @@
             <PasswordField fx:id="confirmPasswordField" promptText="🔁 Confirm Password"
                            style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
 
+            <ComboBox fx:id="comboRole" promptText="🎓 Select Role"
+                      maxWidth="Infinity"
+                      style="-fx-background-radius: 10;
+                             -fx-padding: 10;
+                             -fx-font-size: 14px;
+                             -fx-background-color: white;
+                             -fx-border-color: #bdc3c7;
+                             -fx-border-radius: 10;" />
+
             <Label fx:id="statusLabel" textFill="red" style="-fx-font-size: 12px;" />
 
             <Button text="✅ Signup" onAction="#handleSignup"

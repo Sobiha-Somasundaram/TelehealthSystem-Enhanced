@@ -35,7 +35,7 @@
                        style="-fx-font-size: 16px; -fx-text-fill: #636e72; -fx-font-style: italic;" />
 
                 <!-- Patient Services Section -->
-                <VBox spacing="20" alignment="CENTER">
+                <VBox fx:id="patientSection" spacing="20" alignment="CENTER">
                     <HBox spacing="10" alignment="CENTER">
                         <Separator prefWidth="50"/>
                         <Label text="👤 Patient Services"
@@ -51,7 +51,7 @@
                             <ColumnConstraints prefWidth="200"/>
                         </columnConstraints>
 
-                        <Button text="📅 Book Consultation" onAction="#goToBookConsultation"
+                        <Button fx:id="bookConsultationBtn" text="📅 Book Consultation" onAction="#goToBookConsultation"
                                 GridPane.rowIndex="0" GridPane.columnIndex="0"
                                 prefWidth="190" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #74b9ff, #0984e3);
@@ -59,7 +59,7 @@
                                        -fx-background-radius: 15; -fx-padding: 10;
                                        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
 
-                        <Button text="💊 Prescription Refill" onAction="#goToPrescriptionRefill"
+                        <Button fx:id="prescriptionRefillBtn" text="💊 Prescription Refill" onAction="#goToPrescriptionRefill"
                                 GridPane.rowIndex="0" GridPane.columnIndex="1"
                                 prefWidth="190" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #00b894, #00a085);
@@ -67,7 +67,7 @@
                                        -fx-background-radius: 15; -fx-padding: 10;
                                        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
 
-                        <Button text="💓 Monitor Vitals" onAction="#goToVitalsMonitoring"
+                        <Button fx:id="vitalsMonitoringBtn" text="💓 Monitor Vitals" onAction="#goToVitalsMonitoring"
                                 GridPane.rowIndex="0" GridPane.columnIndex="2"
                                 prefWidth="190" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #fd79a8, #e84393);
@@ -75,7 +75,7 @@
                                        -fx-background-radius: 15; -fx-padding: 10;
                                        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
 
-                        <Button text="📄 Health Report" onAction="#goToHealthReport"
+                        <Button fx:id="healthReportBtn" text="📄 Health Report" onAction="#goToHealthReport"
                                 GridPane.rowIndex="0" GridPane.columnIndex="3"
                                 prefWidth="190" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #a29bfe, #6c5ce7);
@@ -88,7 +88,7 @@
                 <Separator style="-fx-background-color: #ddd;"/>
 
                 <!-- Healthcare Staff Section -->
-                <VBox spacing="20" alignment="CENTER">
+                <VBox fx:id="staffSection" spacing="20" alignment="CENTER">
                     <HBox spacing="10" alignment="CENTER">
                         <Separator prefWidth="50"/>
                         <Label text="👩‍⚕️ Healthcare Staff"
@@ -96,7 +96,7 @@
                         <Separator prefWidth="50"/>
                     </HBox>
                     
-                    <Button text="🗓️ Manage Patient Bookings" onAction="#goToStaffBooking"
+                    <Button fx:id="staffBookingBtn" text="🗓️ Manage Patient Bookings" onAction="#goToStaffBooking"
                             prefWidth="350" prefHeight="50"
                             style="-fx-background-color: linear-gradient(to bottom, #00cec9, #00b894);
                                    -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;
@@ -107,7 +107,7 @@
                 <Separator style="-fx-background-color: #ddd;"/>
 
                 <!-- Doctor Services Section -->
-                <VBox spacing="20" alignment="CENTER">
+                <VBox fx:id="doctorSection" spacing="20" alignment="CENTER">
                     <HBox spacing="10" alignment="CENTER">
                         <Separator prefWidth="50"/>
                         <Label text="👨‍⚕️ Doctor Services"
@@ -116,14 +116,14 @@
                     </HBox>
                     
                     <HBox spacing="25" alignment="CENTER">
-                        <Button text="🩺 Record Diagnosis" onAction="#goToDoctorDiagnosis"
+                        <Button fx:id="doctorDiagnosisBtn" text="🩺 Record Diagnosis" onAction="#goToDoctorDiagnosis"
                                 prefWidth="240" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #e17055, #d63031);
                                        -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;
                                        -fx-background-radius: 15; -fx-padding: 10;
                                        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"/>
 
-                        <Button text="🏥 Hospital Referrals" onAction="#goToHospitalBooking"
+                        <Button fx:id="hospitalBookingBtn" text="🏥 Hospital Referrals" onAction="#goToHospitalBooking"
                                 prefWidth="240" prefHeight="50"
                                 style="-fx-background-color: linear-gradient(to bottom, #fd79a8, #e84393);
                                        -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;

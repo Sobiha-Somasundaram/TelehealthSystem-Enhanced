@@ -17,36 +17,48 @@ public class SignupController {
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label statusLabel;
+    @FXML private ComboBox<String> comboRole;
 
-    @FXML
+@FXML
+    public void initialize() {
+        comboRole.getItems().addAll("Patient", "Doctor", "Admin");
+}
+
+    
+ @FXML   
     private void handleSignup(ActionEvent event) {
         String name = nameField.getText().trim();
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
         String confirm = confirmPasswordField.getText();
+        String role = comboRole.getValue();
 
-        if (name.isEmpty() || username.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
-            statusLabel.setText("All fields are required.");
+        if (name.isEmpty() || username.isEmpty() || password.isEmpty() || confirm.isEmpty()|| role == null) {
+            statusLabel.setText("Please fill all fields and select a role.");
             return;
         }
+        
 
         if (!password.equals(confirm)) {
             statusLabel.setText("Passwords do not match.");
             return;
         }
 
-        try (Connection conn = DatabaseHelper.connect()) {
-            String query = "INSERT INTO users (name, username, password) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseHelper.getConnection()) {
+            
+            String query = "INSERT INTO users (name, username, password, role) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, name);
             pstmt.setString(2, username);
             pstmt.setString(3, password);
+            pstmt.setString(4, role);
             pstmt.executeUpdate();
 
-            statusLabel.setText("Signup successful! Go to login.");
+            statusLabel.setText("Signup successful! Account created for " + role);
+       
             statusLabel.setStyle("-fx-text-fill: green;");
         } catch (Exception e) {
-            statusLabel.setText("Signup failed: " + e.getMessage());
+            statusLabel.setText("Failed to create account: " + e.getMessage());
         }
     }
 

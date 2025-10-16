@@ -80,7 +80,7 @@ public class StaffBookingController {
     private void loadAppointments() {
         appointmentList.clear();
         
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = "SELECT * FROM appointments ORDER BY appointment_date, time_slot";
             PreparedStatement pstmt = conn.prepareStatement(query);
             ResultSet rs = pstmt.executeQuery();
@@ -245,7 +245,7 @@ public class StaffBookingController {
     }
 
     private void updateAppointment(Appointment appointment) {
-        try (Connection conn = DatabaseHelper.connect()) {
+        try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 UPDATE appointments SET 
                 appointment_date = ?, time_slot = ?, status = ?, notes = ?
