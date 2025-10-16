@@ -9,67 +9,88 @@
             style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);">
 
     <center>
-        <VBox alignment="CENTER" spacing="16" fx:id="mainContainer"
+        <VBox alignment="TOP_LEFT" spacing="16" fx:id="mainContainer"
               style="-fx-background-color: rgba(255,255,255,0.95);
                      -fx-background-radius: 20;
                      -fx-padding: 35;
                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0.5, 0, 5);"
-              maxWidth="600" maxHeight="580">
+              maxWidth="700" maxHeight="580">
 
             <Label text="🧠 Vitals Monitoring"
                    style="-fx-font-size: 26px;
                           -fx-text-fill: #5c2b9b;
                           -fx-font-weight: bold;" />
 
-            <GridPane hgap="20" vgap="15" alignment="CENTER">
+            <!-- ================== GRID FOR TWO FIELDS PER ROW ================== -->
+            <GridPane hgap="15" vgap="12" alignment="TOP_LEFT">
                 <columnConstraints>
-                    <ColumnConstraints halignment="RIGHT" minWidth="150"/>
-                    <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                    <ColumnConstraints halignment="RIGHT" minWidth="120"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="150"/>
+                    <ColumnConstraints halignment="RIGHT" minWidth="120"/>
+                    <ColumnConstraints halignment="LEFT" minWidth="150"/>
                 </columnConstraints>
 
-                <Label text="❤️ Pulse:" style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
-                <TextField fx:id="pulseField" promptText="Pulse Rate (bpm)"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <!-- Row 0 -->
+                <Label text="❤️ Pulse:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="pulseField" promptText="Pulse Rate (bpm)" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
+                <Label text="🌡️ Temperature:" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="temperatureField" promptText="Temperature (°C)" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
 
-                <Label text="🌡️ Temperature:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="1"/>
-                <TextField fx:id="temperatureField" promptText="Temperature (°C)"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <!-- Row 1 -->
+                <Label text="💨 Respiration:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="respirationField" promptText="Breaths per min" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
+                <Label text="🩺 Blood Pressure:" GridPane.rowIndex="1" GridPane.columnIndex="2" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="bpField" promptText="e.g. 120/80" GridPane.rowIndex="1" GridPane.columnIndex="3"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
 
-                <Label text="💨 Respiration:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="2"/>
-                <TextField fx:id="respirationField" promptText="Breaths per min"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <!-- Row 2 -->
+                <Label text="⚖️ Weight:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="weightField" promptText="Weight (kg)" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
+                <Label text="📏 Height:" GridPane.rowIndex="2" GridPane.columnIndex="2" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="heightField" promptText="Height (cm)" GridPane.rowIndex="2" GridPane.columnIndex="3"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
 
-                <Label text="🩺 Blood Pressure:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="3"/>
-                <TextField fx:id="bpField" promptText="e.g. 120/80"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-                <Label text="⚖️ Weight:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="4"/>
-                <TextField fx:id="weightField" promptText="Weight (kg)"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-
-                <Label text="📏 Height:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="5"/>
-                <TextField fx:id="heightField" promptText="Height (cm)"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-
-                <Label text="🫁 Oxygen:" style="-fx-font-size: 14px; -fx-text-fill: #333;" GridPane.rowIndex="6"/>
-                <TextField fx:id="oxygenField" promptText="O2 Saturation (%)"
-                           style="-fx-background-radius: 10; -fx-padding: 8;" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                <!-- Row 3 -->
+                <Label text="🫁 Oxygen:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size:14px; -fx-text-fill:#333;"/>
+                <TextField fx:id="oxygenField" promptText="O2 Saturation (%)" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                           style="-fx-background-radius: 10; -fx-padding: 6;"/>
             </GridPane>
 
+            <!-- ================== BUTTONS ================== -->
             <HBox spacing="20" alignment="CENTER">
                 <Button fx:id="sendButton" text="📤 Send to Doctor" onAction="#handleSend"
                         style="-fx-background-color: #5c2b9b;
-                               -fx-text-fill: white;
-                               -fx-font-size: 14px;
-                               -fx-background-radius: 10;
-                               -fx-padding: 10 20;" />
+                   -fx-text-fill: white;
+                   -fx-font-size: 14px;
+                   -fx-background-radius: 10;
+                   -fx-padding: 10 20;" />
 
                 <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
                         style="-fx-background-color: #888;
-                               -fx-text-fill: white;
-                               -fx-background-radius: 10;
-                               -fx-padding: 8 16;" />
+                   -fx-text-fill: white;
+                   -fx-background-radius: 10;
+                   -fx-padding: 8 16;" />
             </HBox>
+
+            <!-- ================== TABLE ================== -->
+            <Label text="📝 Previous Vital Sign Readings" style="-fx-font-size: 16px; -fx-text-fill: #333; -fx-font-weight: bold;" />
+            <TableView fx:id="vitalsTable" prefHeight="220" prefWidth="650" style="-fx-background-radius: 10; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="colPulse" text="Pulse (bpm)" prefWidth="80"/>
+                    <TableColumn fx:id="colTemp" text="Temperature (°C)" prefWidth="90"/>
+                    <TableColumn fx:id="colResp" text="Respiration" prefWidth="90"/>
+                    <TableColumn fx:id="colBP" text="Blood Pressure" prefWidth="100"/>
+                    <TableColumn fx:id="colWeight" text="Weight (kg)" prefWidth="80"/>
+                    <TableColumn fx:id="colHeight" text="Height (cm)" prefWidth="80"/>
+                    <TableColumn fx:id="colOxygen" text="Oxygen (%)" prefWidth="80"/>
+                    <TableColumn fx:id="colRecordedAt" text="Recorded At" prefWidth="150"/>
+                </columns>
+            </TableView>
+
         </VBox>
     </center>
 </BorderPane>

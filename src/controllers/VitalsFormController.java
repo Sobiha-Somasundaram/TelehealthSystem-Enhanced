@@ -7,20 +7,20 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleStringProperty;
 
 import database.DatabaseHelper;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author USER
- */
 public class VitalsFormController {
 
     @FXML private TextField pulseField;
@@ -31,49 +31,36 @@ public class VitalsFormController {
     @FXML private TextField heightField;
     @FXML private TextField oxygenField;
 
-    private int userId;  // <-- logged-in user ID
+    @FXML private TableView<VitalRecord> vitalsTable;
+    @FXML private TableColumn<VitalRecord, String> colPulse;
+    @FXML private TableColumn<VitalRecord, String> colTemp;
+    @FXML private TableColumn<VitalRecord, String> colResp;
+    @FXML private TableColumn<VitalRecord, String> colBP;
+    @FXML private TableColumn<VitalRecord, String> colWeight;
+    @FXML private TableColumn<VitalRecord, String> colHeight;
+    @FXML private TableColumn<VitalRecord, String> colOxygen;
+    @FXML private TableColumn<VitalRecord, String> colRecordedAt;
+
+    private int userId;
+    private String username;
+    private String userRole;
 
     private Map<String, String> vitalData = new HashMap<>();
+    private ObservableList<VitalRecord> vitalsList = FXCollections.observableArrayList();
 
-    // ======= SET USER ID FROM DASHBOARD =======
-
-    /**
-     *
-     * @param id
-     */
-    public void setUserId(int id) {
+    // ================== SET USER INFO ==================
+    public void setUserInfo(int id, String name, String role) {
         this.userId = id;
+        this.username = name;
+        this.userRole = role;
+
+        // Load previous vitals for the user
+        loadPreviousVitals();
     }
 
-    private String getAlertMessage(Map<String, String> vitals) {
-        StringBuilder alert = new StringBuilder();
-
-        try {
-            double pulse = Double.parseDouble(vitals.get("Pulse"));
-            if (pulse < 60) alert.append("Pulse is Low Alert\n");
-            else if (pulse > 100) alert.append("Pulse is High Alert\n");
-
-            double temp = Double.parseDouble(vitals.get("Temperature"));
-            if (temp < 36) alert.append("Temperature is Low Alert\n");
-            else if (temp > 37.5) alert.append("Temperature is High Alert\n");
-
-            double resp = Double.parseDouble(vitals.get("Respiration"));
-            if (resp < 12) alert.append("Respiration is Low Alert\n");
-            else if (resp > 20) alert.append("Respiration is High Alert\n");
-
-            double oxygen = Double.parseDouble(vitals.get("Oxygen"));
-            if (oxygen < 95) alert.append("Oxygen Saturation is Low Alert\n");
-
-        } catch (Exception e) {
-            return "⚠️ Invalid or missing vital values.";
-        }
-
-        return alert.toString().isEmpty() ? null : alert.toString();
-    }
-
+    // ================== HANDLE SEND ==================
     @FXML
     private void handleSend(javafx.event.ActionEvent event) {
-        // Collect vitals
         vitalData.put("Pulse", pulseField.getText());
         vitalData.put("Temperature", temperatureField.getText());
         vitalData.put("Respiration", respirationField.getText());
@@ -82,17 +69,7 @@ public class VitalsFormController {
         vitalData.put("Height", heightField.getText());
         vitalData.put("Oxygen", oxygenField.getText());
 
-        // Validate and show alerts
-        String alertMsg = getAlertMessage(vitalData);
-        if (alertMsg != null) {
-            Alert alertWarning = new Alert(Alert.AlertType.WARNING);
-            alertWarning.setTitle("Vitals Alert");
-            alertWarning.setHeaderText("Abnormal vital signs detected!");
-            alertWarning.setContentText(alertMsg);
-            alertWarning.showAndWait();
-        }
-
-        // ===== Save to Database =====
+        // Save to Database
         String insertSQL = """
             INSERT INTO vitals_records
             (user_id, pulse, temperature, respiration, blood_pressure, weight, height, oxygen)
@@ -112,47 +89,29 @@ public class VitalsFormController {
             pstmt.setBigDecimal(8, new BigDecimal(oxygenField.getText()));
 
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert dbError = new Alert(Alert.AlertType.ERROR);
-            dbError.setTitle("Database Error");
-            dbError.setHeaderText("Failed to save vitals");
-            dbError.setContentText(e.getMessage());
-            dbError.showAndWait();
-            return;
         }
 
-        // Show confirmation
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Vitals Sent");
-        alert.setHeaderText("Vitals sent to your doctor.");
-        alert.setContentText("You can now view a summary chart.");
+        // Refresh the table after adding new record
+        loadPreviousVitals();
 
-        ButtonType viewChart = new ButtonType("View Chart");
-        ButtonType close = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(viewChart, close);
+        // Navigate to VitalsChart with user info
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/VitalsChart.fxml"));
+            Parent root = loader.load();
 
-        alert.showAndWait().ifPresent(type -> {
-            if (type == viewChart) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/VitalsChart.fxml"));
-                    Parent root = loader.load();
+            VitalsChartController controller = loader.getController();
+            controller.setVitalsData(vitalData);
+            controller.setUserInfo(userId, username, userRole); // Pass user info
 
-                    VitalsChartController controller = loader.getController();
-                    controller.setVitalsData(vitalData);
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Vitals Chart");
+            stage.show();
 
-                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setTitle("Vitals Chart");
-                    stage.show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        } catch (Exception e) { e.printStackTrace(); }
 
-        // Clear form
         clearForm();
     }
 
@@ -166,16 +125,104 @@ public class VitalsFormController {
         oxygenField.clear();
     }
 
+    // ================== BACK TO DASHBOARD ==================
     @FXML
     private void goBackToDashboard(javafx.event.ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/views/Dashboard.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
+            Parent root = loader.load();
+
+            DashboardController controller = loader.getController();
+            controller.setUserInfo(userId, username, userRole); // preserve buttons
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("TeleHealth - Dashboard");
+            stage.setTitle("TeleHealth System - Dashboard");
             stage.show();
-        } catch (Exception e) {
+
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // ================== LOAD PREVIOUS VITALS ==================
+    private void loadPreviousVitals() {
+        vitalsList.clear();
+
+        String query = """
+            SELECT pulse, temperature, respiration, blood_pressure, weight, height, oxygen, recorded_at
+            FROM vitals_records
+            WHERE user_id = ?
+            ORDER BY recorded_at DESC
+        """;
+
+        try (Connection conn = DatabaseHelper.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                vitalsList.add(new VitalRecord(
+                        rs.getString("pulse"),
+                        rs.getString("temperature"),
+                        rs.getString("respiration"),
+                        rs.getString("blood_pressure"),
+                        rs.getString("weight"),
+                        rs.getString("height"),
+                        rs.getString("oxygen"),
+                        rs.getString("recorded_at")
+                ));
+            }
+
+            setupTable();
+            vitalsTable.setItems(vitalsList);
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // ================== SETUP TABLE ==================
+    private void setupTable() {
+        colPulse.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().pulse()));
+        colTemp.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().temperature()));
+        colResp.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().respiration()));
+        colBP.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().bloodPressure()));
+        colWeight.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().weight()));
+        colHeight.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().height()));
+        colOxygen.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().oxygen()));
+        colRecordedAt.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().recordedAt()));
+    }
+
+    // ================== INNER CLASS FOR TABLE RECORD ==================
+    public static class VitalRecord {
+        private final String pulse;
+        private final String temperature;
+        private final String respiration;
+        private final String bloodPressure;
+        private final String weight;
+        private final String height;
+        private final String oxygen;
+        private final String recordedAt;
+
+        public VitalRecord(String pulse, String temperature, String respiration, String bloodPressure,
+                           String weight, String height, String oxygen, String recordedAt) {
+            this.pulse = pulse;
+            this.temperature = temperature;
+            this.respiration = respiration;
+            this.bloodPressure = bloodPressure;
+            this.weight = weight;
+            this.height = height;
+            this.oxygen = oxygen;
+            this.recordedAt = recordedAt;
+        }
+
+        public String pulse() { return pulse; }
+        public String temperature() { return temperature; }
+        public String respiration() { return respiration; }
+        public String bloodPressure() { return bloodPressure; }
+        public String weight() { return weight; }
+        public String height() { return height; }
+        public String oxygen() { return oxygen; }
+        public String recordedAt() { return recordedAt; }
     }
 }

@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
+import models.Appointment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,75 +22,98 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * BookConsultationController
- * ---------------------------------------------------------------
- * Allows a logged-in patient to book an appointment with a doctor.
- * Patient name is auto-filled and non-editable.
- * Doctor list is populated dynamically from users(role='Doctor').
- * Appointment time is selected from fixed time slots.
+ * --------------------------------------------------------------- Allows a
+ * logged-in patient to book an appointment with a doctor. Patient name is
+ * auto-filled and non-editable. Doctor list is populated dynamically from
+ * users(role='Doctor'). Appointment time is selected from fixed time slots.
  */
 public class BookConsultationController {
 
     @FXML
     private TextField txtPatientName;
-
     @FXML
     private ComboBox<String> comboDoctor;
-
     @FXML
     private DatePicker datePicker;
-
     @FXML
     private TextArea txtSymptoms;
-
     @FXML
     private Button btnBook;
-
     @FXML
     private ComboBox<String> timeSlotBox;
 
+    // ===== Consultation Mode =====
+    @FXML
+    private RadioButton rbVideo;
+    @FXML
+    private RadioButton rbAudio;
+    @FXML
+    private ToggleGroup consultationModeGroup;
+
+    // ===== Upcoming Appointments Table =====
+    @FXML
+    private TableView<Appointment> upcomingAppointmentsTable;
+    @FXML
+    private TableColumn<Appointment, String> colDoctor;
+    @FXML
+    private TableColumn<Appointment, String> colDate;
+    @FXML
+    private TableColumn<Appointment, String> colTime;
+    @FXML
+    private TableColumn<Appointment, String> colMode;
+    @FXML
+    private TableColumn<Appointment, String> colStatus;
+
     private int patientId;          // passed from login
     private String patientName;     // passed from login
+    private String userRole;        // passed from login (e.g., "patient")
 
     private ObservableList<String> doctorList = FXCollections.observableArrayList();
 
-    /**
-     * Initialize method runs automatically after FXML loading.
-     */
+    // ================== Initialization ==================
     @FXML
     public void initialize() {
         loadDoctors();
 
-        // Ensure patient name is non-editable and visible
         txtPatientName.setEditable(false);
         txtPatientName.setVisible(true);
 
-        // Populate fixed time slots
+        // Fixed time slots
         timeSlotBox.getItems().addAll(
                 "09:00 AM", "10:00 AM", "11:00 AM",
                 "12:00 PM", "02:00 PM", "03:00 PM", "04:00 PM"
         );
+
+        // Initialize ToggleGroup
+        consultationModeGroup = new ToggleGroup();
+        rbVideo.setToggleGroup(consultationModeGroup);
+        rbAudio.setToggleGroup(consultationModeGroup);
+        rbVideo.setSelected(true); // default
+
+        // ===== Initialize TableView columns =====
+        colDoctor.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getSpecialistName()));
+        colDate.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
+                cell.getValue().getAppointmentDate() != null ? cell.getValue().getFormattedDate() : "N/A"));
+        colTime.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getTimeSlot()));
+        colMode.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getConsultationType()));
+        colStatus.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getStatus()));
     }
 
-    /**
-     * Sets the logged-in patient information.
-     * @param id
-     * @param name
-     */
-    public void setPatientInfo(int id, String name) {
+    // ================== Set Patient Info ==================
+    public void setPatientInfo(int id, String name, String role) {
         this.patientId = id;
         this.patientName = name;
+        this.userRole = role;
         txtPatientName.setText(name);
+
+        // Load upcoming appointments after patient info is set
+        loadUpcomingAppointments();
     }
 
-    /**
-     * Loads all doctors from the users table into the ComboBox.
-     */
+    // ================== Load Doctors ==================
     private void loadDoctors() {
         String sql = "SELECT name FROM users WHERE role='Doctor'";
-
-        try (Connection conn = DatabaseHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             doctorList.clear();
             while (rs.next()) {
@@ -102,9 +126,7 @@ public class BookConsultationController {
         }
     }
 
-    /**
-     * Handles the Book Appointment button click.
-     */
+    // ================== Book Appointment ==================
     @FXML
     private void handleBookAppointment(ActionEvent event) {
         String selectedDoctor = comboDoctor.getValue();
@@ -123,26 +145,38 @@ public class BookConsultationController {
             return;
         }
 
-        // Convert "hh:mm a" (e.g., 10:00 AM) to LocalTime
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
-        LocalTime time = LocalTime.parse(selectedTime, formatter);
+        // ===== Parse AM/PM time to 24-hour LocalTime =====
+        LocalTime time;
+        try {
+            String normalizedTime = selectedTime.trim().toUpperCase();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a", java.util.Locale.ENGLISH);
+            time = LocalTime.parse(normalizedTime, formatter);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Time",
+                    "Selected time is invalid. Please choose a valid time slot.");
+            return;
+        }
 
-        String sql = "INSERT INTO bookings (patient_id, doctor_id, appointment_date, appointment_time, symptoms, status) "
-                   + "VALUES (?, ?, ?, ?, ?, 'Pending')";
+        // ===== Get Selected Consultation Mode =====
+        String consultationMode = ((RadioButton) consultationModeGroup.getSelectedToggle()).getText();
 
-        try (Connection conn = DatabaseHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "INSERT INTO bookings (patient_id, doctor_id, appointment_date, appointment_time, symptoms, consultation_mode, status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, 'Pending')";
+
+        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, patientId);
             ps.setInt(2, doctorId);
             ps.setDate(3, java.sql.Date.valueOf(date));
             ps.setTime(4, java.sql.Time.valueOf(time));
             ps.setString(5, symptoms);
+            ps.setString(6, consultationMode);
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Appointment booked successfully!");
                 clearForm();
+                loadUpcomingAppointments(); // refresh table
             }
 
         } catch (SQLException e) {
@@ -151,33 +185,76 @@ public class BookConsultationController {
         }
     }
 
-    /**
-     * Retrieves the doctor_id for a given doctor's name.
-     */
+    // ================== Helper: Get Doctor ID ==================
     private int getDoctorIdByName(String doctorName) {
         String sql = "SELECT user_id FROM users WHERE name=?";
-        try (Connection conn = DatabaseHelper.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, doctorName);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("user_id");
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return -1;
     }
 
-    /**
-     * Navigate back to Dashboard.
-     */
+    // ================== Load Upcoming Appointments ==================
+    private void loadUpcomingAppointments() {
+        String sql = """
+        SELECT b.booking_id,
+               d.name AS doctor_name,
+               b.appointment_date,
+               b.appointment_time,
+               b.consultation_mode,
+               b.status
+        FROM bookings b
+        JOIN users d ON b.doctor_id = d.user_id
+        WHERE b.patient_id = ?
+        ORDER BY b.appointment_date DESC, b.appointment_time DESC
+    """;
+
+        ObservableList<Appointment> appointments = FXCollections.observableArrayList();
+
+        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                appointments.add(new Appointment(
+                        rs.getInt("booking_id"), // appointmentId
+                        null, // patientName (not needed here)
+                        rs.getString("doctor_name"), // specialistName
+                        rs.getDate("appointment_date").toLocalDate(), // appointmentDate
+                        rs.getTime("appointment_time").toString(), // timeSlot as string
+                        rs.getString("status"), // status
+                        rs.getString("consultation_mode"), // consultationType
+                        null // notes
+                ));
+            }
+
+            upcomingAppointmentsTable.setItems(appointments);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Failed to load upcoming appointments: " + e.getMessage());
+        }
+    }
+
+    // ================== Back to Dashboard ==================
     @FXML
     private void goBackToDashboard(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
             Parent root = loader.load();
+
+            DashboardController controller = loader.getController();
+            controller.setUserInfo(patientId, patientName, userRole);
 
             Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -190,19 +267,16 @@ public class BookConsultationController {
         }
     }
 
-    /**
-     * Clears form fields after successful booking.
-     */
+    // ================== Clear Form ==================
     private void clearForm() {
         comboDoctor.getSelectionModel().clearSelection();
         datePicker.setValue(null);
         timeSlotBox.getSelectionModel().clearSelection();
         txtSymptoms.clear();
+        rbVideo.setSelected(true); // reset mode to default
     }
 
-    /**
-     * Shows an alert dialog.
-     */
+    // ================== Show Alert ==================
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

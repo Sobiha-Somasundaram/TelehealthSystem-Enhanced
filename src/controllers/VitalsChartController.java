@@ -10,26 +10,23 @@ import javafx.fxml.FXMLLoader;
 
 import java.util.Map;
 
-/**
- *
- * @author USER
- */
 public class VitalsChartController {
 
     @FXML private BarChart<String, Number> barChart;
 
-    /**
-     *
-     * @param vitals
-     */
+    private int userId;
+    private String userName;
+    private String userRole;
+
     public void setVitalsData(Map<String, String> vitals) {
+        barChart.getData().clear();
+
         XYChart.Series<String, Number> normal = new XYChart.Series<>();
         normal.setName("Normal");
 
         XYChart.Series<String, Number> yours = new XYChart.Series<>();
         yours.setName("You");
 
-        // Define normal ranges (approximate values)
         Map<String, Double> normalValues = Map.of(
                 "Pulse", 75.0,
                 "Temperature", 37.0,
@@ -38,10 +35,10 @@ public class VitalsChartController {
         );
 
         try {
-            double pulse = Double.parseDouble(vitals.get("Pulse"));
-            double temp = Double.parseDouble(vitals.get("Temperature"));
-            double resp = Double.parseDouble(vitals.get("Respiration"));
-            double oxy = Double.parseDouble(vitals.get("Oxygen"));
+            double pulse = Double.parseDouble(vitals.getOrDefault("Pulse", "0"));
+            double temp = Double.parseDouble(vitals.getOrDefault("Temperature", "0"));
+            double resp = Double.parseDouble(vitals.getOrDefault("Respiration", "0"));
+            double oxy = Double.parseDouble(vitals.getOrDefault("Oxygen", "0"));
 
             normal.getData().add(new XYChart.Data<>("Pulse", normalValues.get("Pulse")));
             normal.getData().add(new XYChart.Data<>("Temp", normalValues.get("Temperature")));
@@ -54,25 +51,34 @@ public class VitalsChartController {
             yours.getData().add(new XYChart.Data<>("Oxygen", oxy));
 
             barChart.getData().addAll(normal, yours);
-         // ✅ Set bar colors: Green for Normal, Orange for Yours
-            barChart.lookupAll(".default-color0.chart-bar").forEach(n -> n.setStyle("-fx-bar-fill: #4CAF50;")); // Normal - Green
-            barChart.lookupAll(".default-color1.chart-bar").forEach(n -> n.setStyle("-fx-bar-fill: #FF9800;")); // Yours - Orange
 
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+            barChart.lookupAll(".default-color0.chart-bar")
+                    .forEach(n -> n.setStyle("-fx-bar-fill: #4CAF50;"));
+            barChart.lookupAll(".default-color1.chart-bar")
+                    .forEach(n -> n.setStyle("-fx-bar-fill: #FF9800;"));
+
+        } catch (NumberFormatException e) { e.printStackTrace(); }
+    }
+
+    public void setUserInfo(int id, String name, String role) {
+        this.userId = id;
+        this.userName = name;
+        this.userRole = role;
     }
 
     @FXML
     private void goBackToDashboard(javafx.event.ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/views/Dashboard.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
+            Parent root = loader.load();
+
+            DashboardController controller = loader.getController();
+            controller.setUserInfo(userId, userName, userRole);
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("TeleHealth - Dashboard");
             stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

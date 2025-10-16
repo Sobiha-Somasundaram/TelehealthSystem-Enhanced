@@ -5,81 +5,78 @@
 <?import javafx.scene.control.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.BookConsultationController"
-            prefWidth="800" prefHeight="550"
+            prefWidth="800" prefHeight="600"
             style="-fx-background-color: linear-gradient(to right, #d4fc79, #96e6a1);">
 
     <center>
-        <VBox alignment="CENTER" spacing="15" maxWidth="520"
+        <VBox alignment="TOP_CENTER" spacing="15" maxWidth="600"
               style="-fx-background-color: white;
                      -fx-background-radius: 20;
                      -fx-padding: 35;
                      -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 4);">
 
+            <!-- Title -->
             <Label text="🗓️ Book TeleHealth Consultation"
                    style="-fx-font-size: 20px;
                           -fx-text-fill: #2c3e50;
                           -fx-font-weight: bold;" />
 
-            <TextField fx:id="txtPatientName"
-                       editable="false"
-                       promptText="Patient Name"
-                       style="-fx-background-radius: 10;
-                              -fx-padding: 10;
-                              -fx-font-size: 14px;
-                              -fx-background-color: #f8f9fa;
-                              -fx-border-radius: 10;
-                              -fx-border-color: #ccc;" />
+            <!-- Patient Name (Single Row) -->
+            <TextField fx:id="txtPatientName" editable="false" promptText="Patient Name"
+                       HBox.hgrow="ALWAYS"
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px; -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
-            <ComboBox fx:id="comboDoctor" promptText="👨‍⚕️ Select Doctor"
-                      style="-fx-background-radius: 10;
-                             -fx-padding: 10;
-                             -fx-font-size: 14px;
-                             -fx-background-color: #f8f9fa;
-                             -fx-border-radius: 10;
-                             -fx-border-color: #ccc;" />
+            <!-- Doctor + Consultation Mode Row -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ComboBox fx:id="comboDoctor" promptText="👨‍⚕️ Select Doctor"
+                          style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px; -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
-            <DatePicker fx:id="datePicker"
-                        promptText="Select Date"
-                        style="-fx-background-radius: 10;
-                               -fx-padding: 10;
-                               -fx-font-size: 14px;
-                               -fx-background-color: #f8f9fa;
-                               -fx-border-radius: 10;
-                               -fx-border-color: #ccc;" />
+                <HBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Consultation Mode:" style="-fx-font-size: 14px;"/>
+                    <RadioButton fx:id="rbVideo" text="Video" selected="true"/>
+                    <RadioButton fx:id="rbAudio" text="Audio"/>
+                </HBox>
+            </HBox>
 
-            <ComboBox fx:id="timeSlotBox" promptText="⏰ Select Time Slot"
-                      style="-fx-background-radius: 10;
-                             -fx-padding: 10;
-                             -fx-font-size: 14px;
-                             -fx-background-color: #f8f9fa;
-                             -fx-border-radius: 10;
-                             -fx-border-color: #ccc;" />
+            <!-- Date + Time row -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <DatePicker fx:id="datePicker" promptText="Select Date"
+                            HBox.hgrow="ALWAYS"
+                            style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px; -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
+                <ComboBox fx:id="timeSlotBox" promptText="⏰ Select Time Slot"
+                          style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px; -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
+            </HBox>
+
+            <!-- Symptoms -->
             <TextArea fx:id="txtSymptoms" promptText="Describe your symptoms..."
                       wrapText="true"
-                      style="-fx-background-radius: 10;
-                             -fx-padding: 10;
-                             -fx-font-size: 14px;
-                             -fx-background-color: #f8f9fa;
-                             -fx-border-radius: 10;
-                             -fx-border-color: #ccc;" />
+                      style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px; -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
+            <!-- Status label -->
             <Label fx:id="statusLabel"
                    style="-fx-text-fill: green; -fx-font-size: 12px;" />
 
-            <Button text="✅ Book Appointment" onAction="#handleBookAppointment"
-                    style="-fx-background-color: #3498db;
-                           -fx-text-fill: white;
-                           -fx-font-size: 14px;
-                           -fx-background-radius: 10;
-                           -fx-padding: 8 16;" />
+            <!-- Buttons (Centered) -->
+            <HBox spacing="20" alignment="CENTER">
+                <Button fx:id="btnBook" text="✅ Book Appointment" onAction="#handleBookAppointment"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8 16;" />
 
-            <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
-                    style="-fx-background-color: #777;
-                           -fx-text-fill: white;
-                           -fx-font-size: 13px;
-                           -fx-background-radius: 10;
-                           -fx-padding: 6 14;" />
+                <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                        style="-fx-background-color: #777; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 10; -fx-padding: 6 14;" />
+            </HBox>
+
+            <!-- Upcoming Appointments Table (Always Visible) -->
+            <TableView fx:id="upcomingAppointmentsTable" prefHeight="200">
+                <columns>
+                    <TableColumn text="Doctor" fx:id="colDoctor" prefWidth="150"/>
+                    <TableColumn text="Date" fx:id="colDate" prefWidth="100"/>
+                    <TableColumn text="Time" fx:id="colTime" prefWidth="100"/>
+                    <TableColumn text="Mode" fx:id="colMode" prefWidth="80"/>
+                    <TableColumn text="Status" fx:id="colStatus" prefWidth="100"/>
+                </columns>
+            </TableView>
+
         </VBox>
     </center>
 </BorderPane>

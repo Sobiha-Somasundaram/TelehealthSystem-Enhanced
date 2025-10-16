@@ -5,49 +5,72 @@
 <?import javafx.geometry.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.PrescriptionRefillController"
-            prefWidth="800" prefHeight="550"
+            prefWidth="800" prefHeight="600"
             style="-fx-background-color: linear-gradient(to right, #a1c4fd, #c2e9fb);">
 
     <center>
-        <VBox alignment="CENTER" spacing="14" maxWidth="400"
+        <VBox alignment="TOP_CENTER" spacing="15" maxWidth="600"
               style="-fx-background-color: white;
                      -fx-background-radius: 18;
-                     -fx-padding: 30;
+                     -fx-padding: 35;
                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.3, 0, 4);">
 
+            <!-- Title -->
             <Label text="💊 Prescription Refill Request"
                    style="-fx-font-size: 20px;
                           -fx-font-weight: bold;
                           -fx-text-fill: #2c3e50;" />
 
-            <TextField fx:id="patientNameField" promptText="👤 Patient Name"
-                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
+            <!-- Form Fields -->
+            <TextField fx:id="patientNameField" promptText="👤 Patient Name" editable="false"
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;
+                              -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
             <TextField fx:id="medicationField" promptText="💊 Medication Name"
-                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;
+                              -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
             <TextField fx:id="quantityField" promptText="📦 Quantity"
-                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;" />
+                       style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 14px;
+                              -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
             <TextArea fx:id="noteField" promptText="📝 Notes (optional)" prefHeight="80"
-                      style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 13px;" />
+                      wrapText="true"
+                      style="-fx-background-radius: 10; -fx-padding: 10; -fx-font-size: 13px;
+                             -fx-background-color: #f8f9fa; -fx-border-radius: 10; -fx-border-color: #ccc;" />
 
+            <!-- Status Label -->
             <Label fx:id="statusLabel"
                    style="-fx-text-fill: green; -fx-font-size: 12px;" />
 
-            <Button text="📨 Submit Refill" onAction="#handleSubmit"
-                    style="-fx-background-color: #2980b9;
-                           -fx-text-fill: white;
-                           -fx-font-size: 14px;
-                           -fx-background-radius: 10;
-                           -fx-padding: 8 16;" />
+            <!-- Buttons Row -->
+            <HBox spacing="20" alignment="CENTER">
+                <Button text="📨 Submit Refill" onAction="#handleSubmit"
+                        style="-fx-background-color: #2980b9;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14px;
+                               -fx-background-radius: 10;
+                               -fx-padding: 8 16;" />
 
-            <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
-                    style="-fx-background-color: #7f8c8d;
-                           -fx-text-fill: white;
-                           -fx-font-size: 13px;
-                           -fx-background-radius: 10;
-                           -fx-padding: 6 14;" />
+                <Button text="← Back to Dashboard" onAction="#goBackToDashboard"
+                        style="-fx-background-color: #7f8c8d;
+                               -fx-text-fill: white;
+                               -fx-font-size: 13px;
+                               -fx-background-radius: 10;
+                               -fx-padding: 6 14;" />
+            </HBox>
+
+            <!-- Prescription Refill History Table -->
+            <TableView fx:id="refillHistoryTable" prefHeight="200">
+                <columns>
+                    <TableColumn text="Medication" fx:id="colMedication" prefWidth="150"/>
+                    <TableColumn text="Quantity" fx:id="colQuantity" prefWidth="100"/>
+                    <TableColumn text="Notes" fx:id="colNotes" prefWidth="200"/>
+                    <TableColumn text="Status" fx:id="colStatus" prefWidth="100"/>
+                    <TableColumn text="Requested On" fx:id="colDate" prefWidth="120"/>
+                </columns>
+            </TableView>
+
         </VBox>
     </center>
 </BorderPane>

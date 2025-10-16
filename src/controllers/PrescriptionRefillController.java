@@ -9,15 +9,19 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.fxml.FXMLLoader;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import database.DatabaseHelper;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import javafx.event.ActionEvent;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
- *
- * @author USER
+ * PrescriptionRefillController
+ * ---------------------------------------------------------------
+ * Allows a logged-in patient to submit prescription refill requests.
+ * Displays existing refill history for that patient.
  */
 public class PrescriptionRefillController {
 
@@ -27,23 +31,32 @@ public class PrescriptionRefillController {
     @FXML private TextArea noteField;
     @FXML private Label statusLabel;
 
+    // TableView and Columns
+    @FXML private TableView<RefillRecord> refillHistoryTable;
+    @FXML private TableColumn<RefillRecord, String> colMedication;
+    @FXML private TableColumn<RefillRecord, String> colQuantity;
+    @FXML private TableColumn<RefillRecord, String> colNotes;
+    @FXML private TableColumn<RefillRecord, String> colStatus;
+    @FXML private TableColumn<RefillRecord, String> colDate;
+
+    private ObservableList<RefillRecord> refillHistory = FXCollections.observableArrayList();
+
     private String lastRefillDetails = "";
-    private int userId; // Store logged-in user ID
+    private int userId;        
+    private String patientName;
+    private String userRole;
 
-    // ===== SET PATIENT INFO FROM DASHBOARD =====
-
-    /**
-     *
-     * @param id
-     * @param name
-     */
-    public void setPatientInfo(int id, String name) {
+    // ================== SET PATIENT INFO ==================
+    public void setPatientInfo(int id, String name, String role) {
         this.userId = id;
-        this.patientNameField.setText(name); // Auto-populate
-        this.patientNameField.setDisable(true); // Prevent editing
+        this.patientName = name;
+        this.userRole = role;
+        this.patientNameField.setText(name);
+        this.patientNameField.setDisable(true);
+        loadRefillHistory(); // ✅ Load refill history when patient logs in
     }
 
-    // ============ HANDLE SUBMIT ============
+    // ================== HANDLE SUBMIT ==================
     @FXML
     private void handleSubmit() {
         String medication = medicationField.getText().trim();
@@ -65,17 +78,17 @@ public class PrescriptionRefillController {
             return;
         }
 
-        // ===== INSERT INTO DATABASE WITH user_id =====
+        // ✅ Fixed: use request_date (not created_at)
         String insertSQL = """
             INSERT INTO prescription_refills 
-            (user_id, patient_name, medication_name, quantity, notes, status)
-            VALUES (?, ?, ?, ?, ?, 'Pending')
+            (user_id, patient_name, medication_name, quantity, notes, status, request_date)
+            VALUES (?, ?, ?, ?, ?, 'Pending', NOW())
         """;
 
         try (Connection conn = DatabaseHelper.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
 
-            pstmt.setInt(1, userId); // Store user_id
+            pstmt.setInt(1, userId);
             pstmt.setString(2, patientNameField.getText());
             pstmt.setString(3, medication);
             pstmt.setInt(4, qty);
@@ -89,6 +102,7 @@ public class PrescriptionRefillController {
                 saveLastRefillDetails(patientNameField.getText(), medication, quantity, note);
                 showConfirmationPopup();
                 clearForm();
+                loadRefillHistory(); // ✅ Refresh the table
             } else {
                 statusLabel.setText("❌ Failed to save data. Try again.");
                 statusLabel.setStyle("-fx-text-fill: red;");
@@ -101,7 +115,56 @@ public class PrescriptionRefillController {
         }
     }
 
-    // ============ HELPER: SAVE DETAILS ============
+    // ================== LOAD REFILL HISTORY ==================
+    private void loadRefillHistory() {
+        refillHistory.clear();
+
+        // ✅ Fixed: use request_date instead of created_at
+        String query = """
+            SELECT medication_name, quantity, notes, status, request_date
+            FROM prescription_refills
+            WHERE user_id = ?
+            ORDER BY request_date DESC
+        """;
+
+        try (Connection conn = DatabaseHelper.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                refillHistory.add(new RefillRecord(
+                        rs.getString("medication_name"),
+                        String.valueOf(rs.getInt("quantity")),
+                        rs.getString("notes"),
+                        rs.getString("status"),
+                        rs.getString("request_date")
+                ));
+            }
+
+            setupTable();
+            refillHistoryTable.setItems(refillHistory);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            statusLabel.setText("⚠️ Failed to load refill history.");
+            statusLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+
+    // ================== SETUP TABLE COLUMNS ==================
+    private void setupTable() {
+        if (colMedication.getCellValueFactory() == null) {
+            colMedication.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().medication()));
+            colQuantity.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().quantity()));
+            colNotes.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().notes()));
+            colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().status()));
+            colDate.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().date()));
+        }
+    }
+
+    // ================== HELPER: SAVE DETAILS ==================
     private void saveLastRefillDetails(String patient, String medication, String quantity, String note) {
         lastRefillDetails = """
             ✅ Prescription Refill Submitted!
@@ -113,14 +176,14 @@ public class PrescriptionRefillController {
         """.formatted(patient, medication, quantity, note.isEmpty() ? "N/A" : note);
     }
 
-    // ============ HELPER: CLEAR FORM ============
+    // ================== HELPER: CLEAR FORM ==================
     private void clearForm() {
         medicationField.clear();
         quantityField.clear();
         noteField.clear();
     }
 
-    // ============ POPUP CONFIRMATION ============
+    // ================== POPUP CONFIRMATION ==================
     private void showConfirmationPopup() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Refill Submitted");
@@ -131,13 +194,11 @@ public class PrescriptionRefillController {
         alert.getButtonTypes().setAll(viewBtn, okBtn);
 
         alert.showAndWait().ifPresent(type -> {
-            if (type == viewBtn) {
-                showRefillDetailsPopup();
-            }
+            if (type == viewBtn) showRefillDetailsPopup();
         });
     }
 
-    // ============ SHOW DETAILS POPUP ============
+    // ================== SHOW DETAILS POPUP ==================
     private void showRefillDetailsPopup() {
         Alert viewAlert = new Alert(Alert.AlertType.INFORMATION);
         viewAlert.setTitle("Refill Details");
@@ -160,18 +221,48 @@ public class PrescriptionRefillController {
         viewAlert.showAndWait();
     }
 
-    // ============ NAVIGATION ============
+    // ================== BACK TO DASHBOARD ==================
     @FXML
-    private void goBackToDashboard(javafx.event.ActionEvent event) {
+    private void goBackToDashboard(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Dashboard.fxml"));
             Parent root = loader.load();
+
+            DashboardController controller = loader.getController();
+            controller.setUserInfo(userId, patientName, userRole);
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("TeleHealth - Dashboard");
+            stage.setTitle("TeleHealth System - Dashboard");
             stage.show();
+
         } catch (Exception e) {
             e.printStackTrace();
+            statusLabel.setText("⚠️ Navigation error: " + e.getMessage());
+            statusLabel.setStyle("-fx-text-fill: red;");
         }
+    }
+
+    // ================== INNER CLASS (RECORD MODEL) ==================
+    public static class RefillRecord {
+        private final String medication;
+        private final String quantity;
+        private final String notes;
+        private final String status;
+        private final String date;
+
+        public RefillRecord(String medication, String quantity, String notes, String status, String date) {
+            this.medication = medication;
+            this.quantity = quantity;
+            this.notes = notes;
+            this.status = status;
+            this.date = date;
+        }
+
+        public String medication() { return medication; }
+        public String quantity() { return quantity; }
+        public String notes() { return notes; }
+        public String status() { return status; }
+        public String date() { return date; }
     }
 }
