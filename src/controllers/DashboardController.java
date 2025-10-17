@@ -102,7 +102,7 @@ public class DashboardController {
             Parent root = loader.load();
 
             VitalsFormController controller = loader.getController();
-            controller.setUserInfo(userId, username, userRole); // Pass user info
+            controller.setUserInfo(userId, username, userRole);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

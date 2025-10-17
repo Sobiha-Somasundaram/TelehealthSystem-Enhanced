@@ -19,10 +19,6 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * Controller for doctors to record diagnosis, prescription, and treatment information
- * Allows recording diagnosis results for patient consultations
- */
 public class DoctorDiagnosisController {
 
     @FXML private ComboBox<String> patientComboBox;
@@ -44,25 +40,21 @@ public class DoctorDiagnosisController {
         loadPatients();
         loadRecentDiagnoses();
         
-        // Set default values
-        doctorNameField.setText("Dr. System"); // Default doctor name
-        appointmentIdField.setText("0"); // Will be updated when patient is selected
+        doctorNameField.setText("Dr. Emily Brown");
+        appointmentIdField.setText("0");
     }
 
     private void setupComboBoxes() {
-        // Severity levels
         severityBox.setItems(FXCollections.observableArrayList(
             "MILD", "MODERATE", "SEVERE"
         ));
         severityBox.setValue("MODERATE");
 
-        // Status options
         statusBox.setItems(FXCollections.observableArrayList(
             "ACTIVE", "ONGOING", "RESOLVED"
         ));
         statusBox.setValue("ACTIVE");
 
-        // Add listener for patient selection
         patientComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 loadPatientInfo(newValue);
@@ -243,7 +235,6 @@ public class DoctorDiagnosisController {
             return;
         }
 
-        // Generate basic prescription template based on diagnosis
         String diagnosis = diagnosisArea.getText().toLowerCase();
         String prescription = generatePrescriptionSuggestion(diagnosis);
         
@@ -255,7 +246,6 @@ public class DoctorDiagnosisController {
     }
 
     private String generatePrescriptionSuggestion(String diagnosis) {
-        // Simple prescription generation based on keywords
         StringBuilder prescription = new StringBuilder();
         
         if (diagnosis.contains("fever") || diagnosis.contains("temperature")) {

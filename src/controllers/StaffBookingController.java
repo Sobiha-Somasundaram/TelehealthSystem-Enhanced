@@ -23,22 +23,32 @@ import java.util.Optional;
 import javafx.scene.layout.GridPane;
 
 /**
- * Controller for healthcare staff to manage patient bookings
- * Allows viewing, modifying, and cancelling appointments
+ * Controller for healthcare staff to manage patient bookings Allows viewing,
+ * modifying, and cancelling appointments
  */
 public class StaffBookingController {
 
-    @FXML private TableView<Appointment> appointmentsTable;
-    @FXML private TableColumn<Appointment, String> patientColumn;
-    @FXML private TableColumn<Appointment, String> specialistColumn;
-    @FXML private TableColumn<Appointment, String> dateColumn;
-    @FXML private TableColumn<Appointment, String> timeColumn;
-    @FXML private TableColumn<Appointment, String> statusColumn;
-    
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> statusFilterBox;
-    @FXML private DatePicker dateFilterPicker;
-    @FXML private Label statusLabel;
+    @FXML
+    private TableView<Appointment> appointmentsTable;
+    @FXML
+    private TableColumn<Appointment, String> patientColumn;
+    @FXML
+    private TableColumn<Appointment, String> specialistColumn;
+    @FXML
+    private TableColumn<Appointment, String> dateColumn;
+    @FXML
+    private TableColumn<Appointment, String> timeColumn;
+    @FXML
+    private TableColumn<Appointment, String> statusColumn;
+
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> statusFilterBox;
+    @FXML
+    private DatePicker dateFilterPicker;
+    @FXML
+    private Label statusLabel;
 
     private ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
     private ObservableList<Appointment> filteredList = FXCollections.observableArrayList();
@@ -53,16 +63,14 @@ public class StaffBookingController {
     private void setupTableColumns() {
         patientColumn.setCellValueFactory(new PropertyValueFactory<>("patientName"));
         specialistColumn.setCellValueFactory(new PropertyValueFactory<>("specialistName"));
-        dateColumn.setCellValueFactory(cellData -> 
-            new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFormattedDate()));
+        dateColumn.setCellValueFactory(cellData
+                -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFormattedDate()));
         timeColumn.setCellValueFactory(new PropertyValueFactory<>("timeSlot"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Add row selection listener
         appointmentsTable.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldSelection, newSelection) -> {
-                // Enable/disable buttons based on selection
-            });
+                (obs, oldSelection, newSelection) -> {
+                });
 
         appointmentsTable.setItems(filteredList);
     }
@@ -79,30 +87,30 @@ public class StaffBookingController {
 
     private void loadAppointments() {
         appointmentList.clear();
-        
+
         try (Connection conn = DatabaseHelper.getConnection()) {
-            String query = "SELECT * FROM appointments ORDER BY appointment_date, time_slot";
+            String query = "SELECT *, doctor_name AS specialist_name FROM appointments ORDER BY appointment_date, appointment_time";
             PreparedStatement pstmt = conn.prepareStatement(query);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 Appointment appointment = new Appointment(
-                    rs.getInt("id"),
-                    rs.getString("patient_name"),
-                    rs.getString("specialist_name"),
-                    LocalDate.parse(rs.getString("appointment_date")),
-                    rs.getString("time_slot"),
-                    rs.getString("status"),
-                    rs.getString("consultation_type"),
-                    rs.getString("notes")
+                        rs.getInt("booking_id"),
+                        rs.getString("patient_name"),
+                        rs.getString("doctor_name"),
+                        LocalDate.parse(rs.getString("appointment_date")),
+                        rs.getString("appointment_time"),
+                        rs.getString("status"),
+                        rs.getString("appointment_type"),
+                        rs.getString("notes")
                 );
                 appointmentList.add(appointment);
             }
-            
+
             applyFilters();
             statusLabel.setText("Loaded " + appointmentList.size() + " appointments");
             statusLabel.setStyle("-fx-text-fill: green;");
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load appointments: " + e.getMessage());
@@ -111,21 +119,21 @@ public class StaffBookingController {
 
     private void applyFilters() {
         filteredList.clear();
-        
+
         String searchText = searchField.getText().toLowerCase().trim();
         String statusFilter = statusFilterBox.getValue();
         LocalDate dateFilter = dateFilterPicker.getValue();
 
         for (Appointment appointment : appointmentList) {
-            boolean matchesSearch = searchText.isEmpty() ||
-                appointment.getPatientName().toLowerCase().contains(searchText) ||
-                appointment.getSpecialistName().toLowerCase().contains(searchText);
-            
-            boolean matchesStatus = "ALL".equals(statusFilter) ||
-                appointment.getStatus().equals(statusFilter);
-            
-            boolean matchesDate = dateFilter == null ||
-                appointment.getAppointmentDate().equals(dateFilter);
+            boolean matchesSearch = searchText.isEmpty()
+                    || appointment.getPatientName().toLowerCase().contains(searchText)
+                    || appointment.getSpecialistName().toLowerCase().contains(searchText);
+
+            boolean matchesStatus = "ALL".equals(statusFilter)
+                    || appointment.getStatus().equals(statusFilter);
+
+            boolean matchesDate = dateFilter == null
+                    || appointment.getAppointmentDate().equals(dateFilter);
 
             if (matchesSearch && matchesStatus && matchesDate) {
                 filteredList.add(appointment);
@@ -146,7 +154,6 @@ public class StaffBookingController {
             return;
         }
 
-        // Create dialog for modification
         Dialog<Appointment> dialog = createModifyDialog(selected);
         Optional<Appointment> result = dialog.showAndWait();
 
@@ -208,7 +215,7 @@ public class StaffBookingController {
         ComboBox<String> timeBox = new ComboBox<>();
         timeBox.getItems().addAll("10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "4:00 PM");
         timeBox.setValue(appointment.getTimeSlot());
-        
+
         ComboBox<String> statusBox = new ComboBox<>();
         statusBox.getItems().addAll("SCHEDULED", "RESCHEDULED", "COMPLETED", "CANCELLED");
         statusBox.setValue(appointment.getStatus());
@@ -248,10 +255,10 @@ public class StaffBookingController {
         try (Connection conn = DatabaseHelper.getConnection()) {
             String query = """
                 UPDATE appointments SET 
-                appointment_date = ?, time_slot = ?, status = ?, notes = ?
+                appointment_date = ?, appointment_time = ?, status = ?, notes = ?
                 WHERE id = ?
             """;
-            
+
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, appointment.getAppointmentDate().toString());
             pstmt.setString(2, appointment.getTimeSlot());
@@ -265,7 +272,7 @@ public class StaffBookingController {
                 statusLabel.setText("Appointment updated successfully");
                 statusLabel.setStyle("-fx-text-fill: green;");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to update appointment: " + e.getMessage());

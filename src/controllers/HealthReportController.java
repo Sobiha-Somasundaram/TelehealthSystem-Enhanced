@@ -27,13 +27,12 @@ public class HealthReportController {
     private TextArea reportArea;
 
     private Connection connection;
-    private int userId; // passed from DashboardController
+    private int userId;
     private int latestVitalsId;
     private int latestBookingId;
     private int latestPrescriptionId;
-    private int generatedByDoctorId = 0; // doctor ID who generated the report
+    private int generatedByDoctorId = 0;
 
-    // Patient info fields (fetched from DB)
     private String patientName = "N/A";
     private String doctorName = "N/A";
     private String appointmentDate = "N/A";
@@ -49,28 +48,21 @@ public class HealthReportController {
         }
     }
 
-    /**
-     * Called by DashboardController to pass the logged-in user's ID.
-     */
+
     public void setUserId(int id) {
         this.userId = id;
         generateHealthReport();
     }
 
-    /**
-     * Main method to generate the health report
-     */
+
     private void generateHealthReport() {
         StringBuilder report = new StringBuilder();
 
         try {
-            // Step 1: Fetch patient info using user ID
             fetchPatientDetails(userId);
 
-            // Step 2: Fetch latest vitals, booking, and prescription refill from DB
             fetchLatestRecords(userId);
 
-            // Step 3: Build report
             report.append("🩺 TELEHEALTH SYSTEM - HEALTH REPORT\n");
             report.append("------------------------------------------\n");
             report.append("Patient Name     : ").append(patientName).append("\n");
@@ -113,11 +105,9 @@ public class HealthReportController {
                 report.append("No vitals recorded.\n");
             }
 
-            // Doctor's Advice
             report.append("\n🩺 DOCTOR'S ADVICE\n");
             report.append(generateDoctorAdvice());
 
-            // Display report
             reportArea.setText(report.toString());
 
         } catch (Exception e) {
@@ -126,16 +116,12 @@ public class HealthReportController {
         }
     }
 
-    /**
-     * Fetches patient details (name, doctor, appointment) using user_id
-     */
     private void fetchPatientDetails(int userId) {
         try {
             if (connection == null || connection.isClosed()) {
                 connection = DatabaseHelper.getConnection();
             }
 
-            // Get patient name from users table
             PreparedStatement userStmt = connection.prepareStatement(
                     "SELECT name FROM users WHERE user_id = ?");
             userStmt.setInt(1, userId);
@@ -144,7 +130,6 @@ public class HealthReportController {
                 patientName = userRs.getString("name");
             }
 
-            // Get latest booking info and associated doctor (including doctor_id)
             PreparedStatement bookingStmt = connection.prepareStatement("""
                 SELECT b.appointment_date, b.appointment_time, b.doctor_id, u.name AS doctor_name
                 FROM bookings b
@@ -159,7 +144,7 @@ public class HealthReportController {
                 appointmentDate = bookingRs.getString("appointment_date");
                 appointmentTime = bookingRs.getString("appointment_time");
                 doctorName = bookingRs.getString("doctor_name");
-                generatedByDoctorId = bookingRs.getInt("doctor_id"); // store doctor ID
+                generatedByDoctorId = bookingRs.getInt("doctor_id");
             }
 
         } catch (SQLException e) {
@@ -317,7 +302,7 @@ public class HealthReportController {
 
             // Pass logged-in user info to DashboardController
             DashboardController controller = loader.getController();
-            controller.setUserInfo(userId, patientName, "patient"); // Adjust role if needed
+            controller.setUserInfo(userId, patientName, "patient");
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

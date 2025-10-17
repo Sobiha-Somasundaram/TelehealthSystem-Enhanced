@@ -54,7 +54,6 @@ public class VitalsFormController {
         this.username = name;
         this.userRole = role;
 
-        // Load previous vitals for the user
         loadPreviousVitals();
     }
 
@@ -69,7 +68,6 @@ public class VitalsFormController {
         vitalData.put("Height", heightField.getText());
         vitalData.put("Oxygen", oxygenField.getText());
 
-        // Save to Database
         String insertSQL = """
             INSERT INTO vitals_records
             (user_id, pulse, temperature, respiration, blood_pressure, weight, height, oxygen)
@@ -93,7 +91,6 @@ public class VitalsFormController {
             e.printStackTrace();
         }
 
-        // Refresh the table after adding new record
         loadPreviousVitals();
 
         // Navigate to VitalsChart with user info
@@ -103,7 +100,7 @@ public class VitalsFormController {
 
             VitalsChartController controller = loader.getController();
             controller.setVitalsData(vitalData);
-            controller.setUserInfo(userId, username, userRole); // Pass user info
+            controller.setUserInfo(userId, username, userRole);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -133,7 +130,7 @@ public class VitalsFormController {
             Parent root = loader.load();
 
             DashboardController controller = loader.getController();
-            controller.setUserInfo(userId, username, userRole); // preserve buttons
+            controller.setUserInfo(userId, username, userRole);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

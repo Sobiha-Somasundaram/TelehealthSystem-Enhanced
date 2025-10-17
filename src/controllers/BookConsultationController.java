@@ -20,13 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * BookConsultationController
- * --------------------------------------------------------------- Allows a
- * logged-in patient to book an appointment with a doctor. Patient name is
- * auto-filled and non-editable. Doctor list is populated dynamically from
- * users(role='Doctor'). Appointment time is selected from fixed time slots.
- */
 public class BookConsultationController {
 
     @FXML
@@ -64,9 +57,9 @@ public class BookConsultationController {
     @FXML
     private TableColumn<Appointment, String> colStatus;
 
-    private int patientId;          // passed from login
-    private String patientName;     // passed from login
-    private String userRole;        // passed from login (e.g., "patient")
+    private int patientId;         
+    private String patientName;     
+    private String userRole;        
 
     private ObservableList<String> doctorList = FXCollections.observableArrayList();
 
@@ -176,7 +169,7 @@ public class BookConsultationController {
             if (rows > 0) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Appointment booked successfully!");
                 clearForm();
-                loadUpcomingAppointments(); // refresh table
+                loadUpcomingAppointments();
             }
 
         } catch (SQLException e) {
@@ -226,13 +219,13 @@ public class BookConsultationController {
 
             while (rs.next()) {
                 appointments.add(new Appointment(
-                        rs.getInt("booking_id"), // appointmentId
-                        null, // patientName (not needed here)
-                        rs.getString("doctor_name"), // specialistName
-                        rs.getDate("appointment_date").toLocalDate(), // appointmentDate
-                        rs.getTime("appointment_time").toString(), // timeSlot as string
-                        rs.getString("status"), // status
-                        rs.getString("consultation_mode"), // consultationType
+                        rs.getInt("booking_id"),
+                        null, 
+                        rs.getString("doctor_name"),
+                        rs.getDate("appointment_date").toLocalDate(),
+                        rs.getTime("appointment_time").toString(),
+                        rs.getString("status"),
+                        rs.getString("consultation_mode"),
                         null // notes
                 ));
             }
@@ -273,7 +266,7 @@ public class BookConsultationController {
         datePicker.setValue(null);
         timeSlotBox.getSelectionModel().clearSelection();
         txtSymptoms.clear();
-        rbVideo.setSelected(true); // reset mode to default
+        rbVideo.setSelected(true);
     }
 
     // ================== Show Alert ==================

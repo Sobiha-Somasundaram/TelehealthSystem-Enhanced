@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.PatientBookingManagementController"
+            prefHeight="700.0" prefWidth="1000.0"
+            style="-fx-background-color: #f5f6fa;">
+
+    <top>
+        <VBox alignment="CENTER" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Label text="Patient Booking Management" 
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="Manage patient appointments and bookings" 
+                   style="-fx-font-size: 14px; -fx-text-fill: #dfe6e9;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 20;">
+            <!-- Search and Filter Section -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Search by patient name..." prefWidth="250"
+                           style="-fx-background-radius: 20; -fx-padding: 8;"/>
+                
+                <ComboBox fx:id="statusFilterBox" promptText="Filter by status" prefWidth="150"
+                          style="-fx-background-radius: 20;"/>
+                
+                <DatePicker fx:id="dateFilterPicker" promptText="Filter by date"
+                            style="-fx-background-radius: 20;"/>
+                
+                <Button text="Apply Filters" onAction="#handleApplyFilters"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; 
+                               -fx-background-radius: 20; -fx-padding: 8 15;"/>
+                
+                <Button text="Clear Filters" onAction="#handleClearFilters"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; 
+                               -fx-background-radius: 20; -fx-padding: 8 15;"/>
+                
+                <Region HBox.hgrow="ALWAYS" />
+                
+                <Button text="Refresh" onAction="#handleRefresh"
+                        style="-fx-background-color: #2ecc71; -fx-text-fill: white; 
+                               -fx-background-radius: 20; -fx-padding: 8 15;"/>
+            </HBox>
+            
+            <!-- Bookings Table -->
+            <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: white; -fx-background-radius: 10;
+                              -fx-border-color: #e1e8ed; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="patientColumn" text="Patient" prefWidth="150"/>
+                    <TableColumn fx:id="doctorColumn" text="Doctor" prefWidth="150"/>
+                    <TableColumn fx:id="dateColumn" text="Date" prefWidth="120"/>
+                    <TableColumn fx:id="timeColumn" text="Time" prefWidth="100"/>
+                    <TableColumn fx:id="symptomsColumn" text="Symptoms" prefWidth="200"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                </columns>
+                <placeholder>
+                    <Label text="No bookings found" style="-fx-text-fill: #7f8c8d;"/>
+                </placeholder>
+            </TableView>
+            
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Add New Booking" onAction="#handleAddBooking"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; 
+                               -fx-font-size: 14px; -fx-background-radius: 5; -fx-padding: 10 20;"/>
+                
+                <Button text="Edit Booking" onAction="#handleEditBooking"
+                        style="-fx-background-color: #f39c12; -fx-text-fill: white; 
+                               -fx-font-size: 14px; -fx-background-radius: 5; -fx-padding: 10 20;"/>
+                
+                <Button text="Cancel Booking" onAction="#handleCancelBooking"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; 
+                               -fx-font-size: 14px; -fx-background-radius: 5; -fx-padding: 10 20;"/>
+                
+                <Button text="View Details" onAction="#handleViewDetails"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; 
+                               -fx-font-size: 14px; -fx-background-radius: 5; -fx-padding: 10 20;"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
+            <Label fx:id="statusLabel" style="-fx-font-style: italic; -fx-text-fill: #7f8c8d;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Back to Dashboard" onAction="#handleBackToDashboard"
+                    style="-fx-background-color: #34495e; -fx-text-fill: white; 
+                           -fx-background-radius: 5; -fx-padding: 8 15;"/>
+            <padding>
+                <Insets right="20" />
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>

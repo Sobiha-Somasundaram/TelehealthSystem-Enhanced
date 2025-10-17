@@ -53,7 +53,7 @@ public class PrescriptionRefillController {
         this.userRole = role;
         this.patientNameField.setText(name);
         this.patientNameField.setDisable(true);
-        loadRefillHistory(); // ✅ Load refill history when patient logs in
+        loadRefillHistory();
     }
 
     // ================== HANDLE SUBMIT ==================
@@ -78,7 +78,6 @@ public class PrescriptionRefillController {
             return;
         }
 
-        // ✅ Fixed: use request_date (not created_at)
         String insertSQL = """
             INSERT INTO prescription_refills 
             (user_id, patient_name, medication_name, quantity, notes, status, request_date)
@@ -102,7 +101,7 @@ public class PrescriptionRefillController {
                 saveLastRefillDetails(patientNameField.getText(), medication, quantity, note);
                 showConfirmationPopup();
                 clearForm();
-                loadRefillHistory(); // ✅ Refresh the table
+                loadRefillHistory();
             } else {
                 statusLabel.setText("❌ Failed to save data. Try again.");
                 statusLabel.setStyle("-fx-text-fill: red;");
@@ -119,7 +118,6 @@ public class PrescriptionRefillController {
     private void loadRefillHistory() {
         refillHistory.clear();
 
-        // ✅ Fixed: use request_date instead of created_at
         String query = """
             SELECT medication_name, quantity, notes, status, request_date
             FROM prescription_refills

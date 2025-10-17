@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.HBox;
 
 import models.HospitalReferral;
 import database.DatabaseHelper;
@@ -44,8 +45,8 @@ public class HospitalBookingController {
         loadRecentReferrals();
         
         // Set default values
-        doctorNameField.setText("Dr. System");
-        preferredDatePicker.setValue(LocalDate.now().plusDays(7)); // Default to next week
+        doctorNameField.setText("Dr. Emily Brown");
+        preferredDatePicker.setValue(LocalDate.now().plusDays(7));
     }
 
     private void setupComboBoxes() {
@@ -339,7 +340,7 @@ public class HospitalBookingController {
 
         TextArea textArea = new TextArea(letter);
         textArea.setWrapText(true);
-        textArea.setEditable(true); // Allow editing
+        textArea.setEditable(true);
         textArea.setPrefHeight(500);
         textArea.setPrefWidth(600);
 
